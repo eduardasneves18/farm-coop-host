@@ -4,6 +4,7 @@ import { UserAuthChecker } from '@/utils/userAuthChecker';
 import { FirebaseServiceGeneric } from '@/services/firebase/FirebaseServiceGeneric';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
 import { DateField, NumberField } from 'generic-components-web';
+import router from 'next/router';
 
 interface Product {
   productId: string;
@@ -31,7 +32,7 @@ export default function RegisterProductionScreen() {
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
         alert('Usuário não autenticado');
-        // redirecionar ou tratar
+        router.push('/home');
       },
     });
   }, []);
@@ -97,7 +98,6 @@ export default function RegisterProductionScreen() {
     <div style={{ maxWidth: 600, margin: 'auto', padding: 20, color: '#D5C1A1', fontFamily: 'Arial, sans-serif' }}>
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#D5C1A1' }}>Registrar Produção</h1>
 
-      {/* Product Dropdown substituído */}
       <div style={{ marginBottom: 10 }}>
         <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Produto</label>
         <select
@@ -105,7 +105,7 @@ export default function RegisterProductionScreen() {
           onChange={(e) => {
             const selectedId = e.target.value;
             const produto = selectedId
-              ? { productId: selectedId, unidade_medida: 'kg' } // ajuste conforme seus dados reais
+              ? { productId: selectedId, unidade_medida: 'kg' }
               : null;
             setProdutoSelecionado(produto);
             setUnidadeSelecionada(produto?.unidade_medida ?? null);
@@ -119,7 +119,6 @@ export default function RegisterProductionScreen() {
         </select>
       </div>
 
-      {/* Quantity Field */}
       <div style={{ marginBottom: 10 }}>
         <NumberField
           value={quantidade}
@@ -134,7 +133,6 @@ export default function RegisterProductionScreen() {
         />
       </div>
 
-      {/* Unit Dropdown substituído */}
       <div style={{ marginBottom: 10 }}>
         <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Unidade</label>
         <select
@@ -149,7 +147,6 @@ export default function RegisterProductionScreen() {
         </select>
       </div>
 
-      {/* Status Dropdown substituído */}
       <div style={{ marginBottom: 10 }}>
         <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Status da Produção</label>
         <select
@@ -170,7 +167,6 @@ export default function RegisterProductionScreen() {
         </select>
       </div>
 
-      {/* Estimated Date Field */}
       <div style={{ marginBottom: 30 }}>
         <DateField
           value={dataEstimada}

@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+
 import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
+import { UserAuthChecker } from '@/utils/user_auth_checker';
 
 import {
   TextField,
@@ -15,6 +18,19 @@ const goalService = new GoalsFirebaseService();
 const userService = new UsersFirebaseService();
 
 export default function InsertGoalScreen() {
+  const router = useRouter();
+  const [userChecked, setUserChecked] = useState(false);
+
+  useEffect(() => {
+    UserAuthChecker.check({
+      onAuthenticated: () => setUserChecked(true),
+      onUnauthenticated: () => {
+        alert('Usuário não autenticado');
+        router.push('/home');
+      },
+    });
+  }, []);
+
   const [nome, setNome] = useState('');
   const [tipo, setTipo] = useState('');
   const [valor, setValor] = useState('');
@@ -59,9 +75,10 @@ export default function InsertGoalScreen() {
     }
   };
 
+  if (!userChecked) return null;
+
   return (
     <div className="max-w-3xl mx-auto p-6 text-white">
-
       <div className="grid grid-cols-1 gap-4 mt-6">
         <TextField
           id="tipo"

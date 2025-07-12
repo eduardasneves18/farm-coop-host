@@ -1,11 +1,27 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { Header, TextField, NumberField } from 'generic-components-web';
+
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
+import { UserAuthChecker } from '@/utils/userAuthChecker';
 
 export default function RegisterSaleScreen() {
+  const router = useRouter();
+  const [userChecked, setUserChecked] = useState(false);
+
+  useEffect(() => {
+    UserAuthChecker.check({
+      onAuthenticated: () => setUserChecked(true),
+      onUnauthenticated: () => {
+        alert('Usuário não autenticado');
+        router.push('/home');
+      },
+    });
+  }, []);
+
   const [produto, setProduto] = useState<null>(null);
   const [produtoId, setProdutoId] = useState('');
   const [produtoNome, setProdutoNome] = useState('');
@@ -19,7 +35,6 @@ export default function RegisterSaleScreen() {
   const salesService = new SalesFirebaseService();
   const productsService = new ProductsFirebaseService();
 
-  // Atualiza valor da venda automaticamente
   useEffect(() => {
     const q = parseFloat(quantidade);
     const preco = parseFloat(precoVenda);
@@ -70,11 +85,11 @@ export default function RegisterSaleScreen() {
     }
   };
 
+  if (!userChecked) return null;
+
   return (
     <div className="max-w-3xl mx-auto p-6 text-white">
-
       <div className="grid grid-cols-1 gap-4 mt-6">
-        {/* Substituir por LookupField de produtos */}
         <TextField
           id="produto"
           label="Produto (temporário)"
@@ -106,7 +121,7 @@ export default function RegisterSaleScreen() {
           className="w-full"
           value={valor}
           required
-          onChange={() => {}} 
+          onChange={() => {}}
         />
 
         <TextField
@@ -119,7 +134,6 @@ export default function RegisterSaleScreen() {
           onChange={(e) => setCliente(e.target.value)}
         />
 
-        {/* Substituir por LookupField de unidade */}
         <TextField
           id="unidade"
           label="Unidade"
@@ -130,7 +144,6 @@ export default function RegisterSaleScreen() {
           onChange={(e) => setUnidade(e.target.value)}
         />
 
-        {/* Substituir por LookupField de pagamento */}
         <TextField
           id="formaPagamento"
           label="Forma de Pagamento"

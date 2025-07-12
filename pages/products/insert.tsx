@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import {
   TextField,
   NumberField,
 } from 'generic-components-web';
+
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
+import { UserAuthChecker } from '@/utils/userAuthChecker';
 
 const InsertProductScreen: React.FC = () => {
+  const router = useRouter();
+  const [userChecked, setUserChecked] = useState(false);
+
+  useEffect(() => {
+    UserAuthChecker.check({
+      onAuthenticated: () => setUserChecked(true),
+      onUnauthenticated: () => {
+        alert('Usuário não autenticado');
+        router.push('/home');
+      },
+    });
+  }, []);
+
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('');
   const [quantity, setQuantity] = useState<number | ''>('');
@@ -54,6 +72,7 @@ const InsertProductScreen: React.FC = () => {
 
       alert('Produto cadastrado com sucesso!');
 
+      // Resetar campos
       setName('');
       setUnit('');
       setQuantity('');
@@ -66,6 +85,8 @@ const InsertProductScreen: React.FC = () => {
       alert('Erro ao cadastrar produto: ' + e.message);
     }
   };
+
+  if (!userChecked) return null;
 
   return (
     <div style={{ padding: '2rem', maxWidth: 600, margin: 'auto' }}>
@@ -127,10 +148,9 @@ const InsertProductScreen: React.FC = () => {
         label="Margem de Lucro (%)"
         placeholder="Lucro calculado"
         value={profitMargin}
-        className="field" 
-        onChange={function (event: React.ChangeEvent<any>): void {
-          throw new Error('Function not implemented.');
-        } }      />
+        className="field"
+        readOnly
+      />
 
       <button
         onClick={handleSubmit}
