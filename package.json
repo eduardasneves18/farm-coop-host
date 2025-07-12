@@ -12,10 +12,10 @@
     "@module-federation/nextjs-mf": "^8.8.32",
     "date-fns": "^4.1.0",
     "firebase": "^11.10.0",
+    "generic-components-web": "github:eduardasneves18/generic-components-web",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "yes-bank-components": "github:eduardasneves18/generic-components-web",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

@@ -1,3 +1,4 @@
+import { app } from "@/FirebaseConfig";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -6,7 +7,7 @@ import {
 } from "firebase/auth";
 
 export class LoginFirebaseAuthService {
-  private auth = getAuth();
+  private auth = getAuth(app);
 
   async signInWithEmailPassword(
     email: string,

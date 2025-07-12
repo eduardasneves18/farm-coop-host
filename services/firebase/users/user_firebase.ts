@@ -1,3 +1,4 @@
+import { app } from "@/FirebaseConfig";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -7,7 +8,7 @@ import {
 } from "firebase/auth";
 
 export class UsersFirebaseService {
-  private auth = getAuth();
+  private auth = getAuth(app);
 
   async getUser(): Promise<User | null> {
     return this.auth.currentUser;
