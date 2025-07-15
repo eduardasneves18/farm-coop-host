@@ -1,6 +1,6 @@
 import { ProductsCacheService } from "@/services/cache/products/product_cache_service";
 import { LoginFirebaseAuthService } from "../users/login/login_firebase";
-import { Cliente, clienteStore } from "@/store/cliente_store.g";
+import clienteStore, { Cliente } from "@/store/client_store";
 
 export class SessionManager {
   private static readonly sessionTimeout = 10 * 60 * 1000; // 10 minutos em ms

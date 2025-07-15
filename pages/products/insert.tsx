@@ -19,7 +19,7 @@ const InsertProductScreen: React.FC = () => {
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
         alert('Usuário não autenticado');
-        router.push('/home');
+        router.push('/login/login');
       },
     });
   }, []);

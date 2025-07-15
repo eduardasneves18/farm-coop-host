@@ -67,8 +67,7 @@ export default function UserRegister(props: UserRegisterProps) {
       }}
     >
       <div style={{ marginBottom: 40, textAlign: 'center' }}>
-        <h1 style={{ fontSize: '8vw', fontWeight: 'bold', color: '#4CAF50', margin: 0 }}>FarmCoop</h1>
-        <p>Cadastro</p>
+        <h1 style={{ fontSize: '3vw', fontWeight: 'bold', color: '#4CAF50', margin: 0 }}>Faça seu cadastro!</h1>
       </div>
 
       <div style={{ width: '100%', maxWidth: 400 }}>
@@ -83,7 +82,7 @@ export default function UserRegister(props: UserRegisterProps) {
           cursorColor="#FFFFFF"
           borderColor="#4CAF50"
           textColor="#D5C1A1"
-          iconName="person" // ajuste conforme seu componente suporta
+          iconName="person"
           textType="text"
           style={{ marginTop: 16 }}
         />

@@ -2,7 +2,6 @@ import { ProductionsCacheService } from "@/services/cache/production/production_
 import { FirebaseServiceGeneric } from "../FirebaseServiceGeneric";
 import { UsersFirebaseService } from "../users/user_firebase";
 
-
 type ProductionItem = {
   id?: string;
   produto: string;
@@ -33,9 +32,9 @@ export class ProductionFirebaseService {
   }): Promise<void> {
     try {
       const user = await this.usersService.getUser();
-      if (!user) throw new Error('Nenhum usuário autenticado');
+      if (!user) throw new Error("Nenhum usuário autenticado");
 
-      await this.firebaseService.create('production', {
+      await this.firebaseService.create("production", {
         usuario_id: user.uid,
         produto,
         quantidade,
@@ -54,14 +53,13 @@ export class ProductionFirebaseService {
   async getProductionItems(productId?: string): Promise<ProductionItem[]> {
     await this.cacheService.clear();
 
-    let items = await this.cacheService.get() as ProductionItem[];
+    let items = (await this.cacheService.get()) as ProductionItem[];
 
     if (!items || items.length === 0) {
-      const snapshot = await this.firebaseService.fetch('production');
-
+      const snapshot = await this.firebaseService.fetch("production");
       items = [];
 
-      if (snapshot.exists()) {
+      if (snapshot?.exists?.()) {
         const data = snapshot.val() as Record<string, any>;
 
         for (const key in data) {
@@ -89,32 +87,38 @@ export class ProductionFirebaseService {
     return items;
   }
 
-  async updateProductionItem(id: string, data: Partial<ProductionItem>): Promise<void> {
-    await this.firebaseService.update('production', id, data);
+  async updateProductionItem(
+    id: string,
+    data: Partial<ProductionItem>
+  ): Promise<void> {
+    await this.firebaseService.update("production", id, data);
     await this.cacheService.clear();
   }
 
   async deleteProductionItem(id: string): Promise<void> {
-    await this.firebaseService.delete('production', id);
+    await this.firebaseService.delete("production", id);
     await this.cacheService.clear();
   }
 
   async filterByStatus(status: string): Promise<ProductionItem[]> {
     const user = await this.usersService.getUser();
-    if (!user) throw new Error('Usuário não autenticado');
+    if (!user) throw new Error("Usuário não autenticado");
 
     const allItems = await this.getProductionItems();
-    return allItems.filter(item => item.status === status);
+    return allItems.filter((item) => item.status === status);
   }
 
-  async getProductionProp(productId: string, prop: keyof ProductionItem): Promise<any | null> {
+  async getProductionProp(
+    productId: string,
+    prop: keyof ProductionItem
+  ): Promise<any | null> {
     try {
       const production = await this.getProductionItems(productId);
       if (production.length > 0) {
         return production[0][prop];
       }
     } catch (e) {
-      console.error('Erro ao buscar propriedade de produção:', e);
+      console.error("Erro ao buscar propriedade de produção:", e);
     }
     return null;
   }
