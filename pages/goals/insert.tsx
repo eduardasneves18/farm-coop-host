@@ -5,14 +5,13 @@ import { useRouter } from 'next/router';
 
 import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
-import { UserAuthChecker } from '@/utils/user_auth_checker';
 
 import {
   TextField,
   NumberField,
   DateField,
-  Header,
-} from 'generic-components-web';
+} from '../../components/coop-farm-components';
+import { UserAuthChecker } from '@/utils/userAuthChecker';
 
 const goalService = new GoalsFirebaseService();
 const userService = new UsersFirebaseService();
@@ -29,7 +28,7 @@ export default function InsertGoalScreen() {
         router.push('/home');
       },
     });
-  }, []);
+  }, [router]); // Adiciona `router` nas dependências conforme o warning
 
   const [nome, setNome] = useState('');
   const [tipo, setTipo] = useState('');
@@ -38,6 +37,11 @@ export default function InsertGoalScreen() {
   const [quantidade, setQuantidade] = useState('');
   const [prazo, setPrazo] = useState('');
   const [produtoId, setProdutoId] = useState('');
+
+  // Definindo um tipo específico para erro no catch para evitar `any`
+  type ErrorWithMessage = {
+    message: string;
+  };
 
   const handleSalvar = async () => {
     if (!nome || !tipo || !valor || !unidade || !quantidade || !prazo || !produtoId) {
@@ -70,8 +74,10 @@ export default function InsertGoalScreen() {
       setQuantidade('');
       setPrazo('');
       setProdutoId('');
-    } catch (e: any) {
-      alert(`Erro ao salvar meta: ${e.message}`);
+    } catch (e) {
+      // Faz um type guard para erro com mensagem
+      const error = e as ErrorWithMessage;
+      alert(`Erro ao salvar meta: ${error.message || 'Erro desconhecido'}`);
     }
   };
 
@@ -87,7 +93,7 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={tipo}
           required
-          onChange={(e) => setTipo(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTipo(e.target.value)}
         />
 
         <TextField
@@ -97,7 +103,7 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={produtoId}
           required
-          onChange={(e) => setProdutoId(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProdutoId(e.target.value)}
         />
 
         <TextField
@@ -107,7 +113,7 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={nome}
           required
-          onChange={(e) => setNome(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)}
         />
 
         <NumberField
@@ -117,7 +123,7 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={valor}
           required
-          onChange={(e) => setValor(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValor(e.target.value)}
         />
 
         <div className="flex gap-4">
@@ -128,7 +134,7 @@ export default function InsertGoalScreen() {
             className="w-full"
             value={unidade}
             required
-            onChange={(e) => setUnidade(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUnidade(e.target.value)}
           />
           <NumberField
             id="quantidade"
@@ -137,7 +143,7 @@ export default function InsertGoalScreen() {
             className="w-full"
             value={quantidade}
             required
-            onChange={(e) => setQuantidade(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuantidade(e.target.value)}
           />
         </div>
 
@@ -148,7 +154,7 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={prazo}
           required
-          onChange={(e) => setPrazo(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrazo(e.target.value)}
         />
 
         <button

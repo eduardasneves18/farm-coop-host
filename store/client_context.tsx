@@ -3,7 +3,7 @@ import clienteStore, { ClienteStore } from './client_store';
 
 const ClienteContext = createContext<ClienteStore>(clienteStore);
 
-export const ClienteProvider: React.FC = ({ children }) => {
+export const ClienteProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   return (
     <ClienteContext.Provider value={clienteStore}>
       {children}

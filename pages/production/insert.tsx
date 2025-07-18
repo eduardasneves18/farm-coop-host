@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import router from 'next/router';
 
 import { UserAuthChecker } from '@/utils/userAuthChecker';
 import { FirebaseServiceGeneric } from '@/services/firebase/FirebaseServiceGeneric';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
-import { DateField, NumberField } from 'generic-components-web';
-import router from 'next/router';
+
+import { DateField, NumberField } from '../../components/coop-farm-components';
 
 interface Product {
   productId: string;
   unidade_medida: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const statusOptions = ['Aguardando', 'Em Produção', 'Colhido'];
@@ -17,7 +18,6 @@ const statusOptions = ['Aguardando', 'Em Produção', 'Colhido'];
 export default function RegisterProductionScreen() {
   const [userChecked, setUserChecked] = useState(false);
 
-  // Estados dos campos
   const [produtoSelecionado, setProdutoSelecionado] = useState<Product | null>(null);
   const [quantidade, setQuantidade] = useState<string>('');
   const [unidadeSelecionada, setUnidadeSelecionada] = useState<string | null>(null);
@@ -46,17 +46,14 @@ export default function RegisterProductionScreen() {
   };
 
   const validarCampos = () => {
-    if (
-      !produtoSelecionado ||
-      !quantidade ||
-      parseFloat(quantidade) <= 0 ||
-      !unidadeSelecionada ||
-      !statusSelecionado ||
-      (statusSelecionado !== 'Colhido' && !dataEstimada)
-    ) {
-      return false;
-    }
-    return true;
+    return (
+      produtoSelecionado &&
+      quantidade &&
+      parseFloat(quantidade) > 0 &&
+      unidadeSelecionada &&
+      statusSelecionado &&
+      (statusSelecionado === 'Colhido' || dataEstimada)
+    );
   };
 
   const salvarProducao = async () => {
@@ -71,7 +68,7 @@ export default function RegisterProductionScreen() {
 
       await firebaseService.create('productions', {
         usuario_id: user.uid,
-        produto: produtoSelecionado.productId,
+        produto: produtoSelecionado?.productId,
         quantidade: parseFloat(quantidade),
         unidade: unidadeSelecionada,
         data_estimada: statusSelecionado === 'Colhido' ? null : dataEstimada,
@@ -81,22 +78,41 @@ export default function RegisterProductionScreen() {
 
       alert('Produção registrada com sucesso!');
       limparCampos();
-    } catch (error: any) {
-      alert(`Erro ao salvar produção: ${error.message || error}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Erro ao salvar produção: ${errorMessage}`);
     }
   };
 
   if (!userChecked) {
     return (
-      <div style={{ width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div
+        style={{
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <div>Carregando...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: 'auto', padding: 20, color: '#D5C1A1', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#D5C1A1' }}>Registrar Produção</h1>
+    <div
+      style={{
+        maxWidth: 600,
+        margin: 'auto',
+        padding: 20,
+        color: '#D5C1A1',
+        fontFamily: 'Arial, sans-serif',
+      }}
+    >
+      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#D5C1A1' }}>
+        Registrar Produção
+      </h1>
 
       <div style={{ marginBottom: 10 }}>
         <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Produto</label>
@@ -104,9 +120,7 @@ export default function RegisterProductionScreen() {
           value={produtoSelecionado?.productId || ''}
           onChange={(e) => {
             const selectedId = e.target.value;
-            const produto = selectedId
-              ? { productId: selectedId, unidade_medida: 'kg' }
-              : null;
+            const produto = selectedId ? { productId: selectedId, unidade_medida: 'kg' } : null;
             setProdutoSelecionado(produto);
             setUnidadeSelecionada(produto?.unidade_medida ?? null);
           }}
@@ -121,15 +135,13 @@ export default function RegisterProductionScreen() {
 
       <div style={{ marginBottom: 10 }}>
         <NumberField
+          id="quantidade"
           value={quantidade}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuantidade(e.target.value)}
-          hint={`Quantidade${unidadeSelecionada ? ` (${unidadeSelecionada})` : ''}`}
-          iconColor="#D5C1A1"
-          textColor="#D5C1A1"
-          borderColor="#4CAF50"
-          cursorColor="#4CAF50"
-          fillColor="transparent"
-          labelColor="#4CAF50"
+          onChange={(e) => setQuantidade(e.target.value)}
+          label={`Quantidade${unidadeSelecionada ? ` (${unidadeSelecionada})` : ''}`}
+          placeholder="Informe a quantidade"
+          className=""
+          required
         />
       </div>
 
@@ -169,14 +181,13 @@ export default function RegisterProductionScreen() {
 
       <div style={{ marginBottom: 30 }}>
         <DateField
+          id="data-estimada"
           value={dataEstimada}
-          onChange={(value: string) => setDataEstimada(value)}
-          hint="Data Estimada para Colheita"
-          textColor="#D5C1A1"
-          borderColor="#4CAF50"
-          iconColor="#D5C1A1"
-          fillColor="transparent"
-          disabled={statusSelecionado === 'Colhido'}
+          onChange={(e) => setDataEstimada(e.target.value)}
+          label="Data Estimada para Colheita"
+          placeholder="Selecione a data"
+          className=""
+          required={statusSelecionado !== 'Colhido'}
         />
       </div>
 

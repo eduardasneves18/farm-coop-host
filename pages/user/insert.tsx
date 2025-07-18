@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { TextField, PasswordField } from 'generic-components-web';
+import { TextField, PasswordField, Dashboard } from '../../components/coop-farm-components';;
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
 
-interface UserRegisterProps {}
-
-export default function UserRegister(props: UserRegisterProps) {
+export default function UserRegister() {
   const router = useRouter();
   const usersFirebaseService = new UsersFirebaseService();
 
@@ -15,120 +13,86 @@ export default function UserRegister(props: UserRegisterProps) {
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
 
-  const validarCampos = () => {
-    if (!name.trim()) {
-      alert('Por favor, digite seu nome.');
-      return false;
-    }
-    if (!email.trim()) {
-      alert('Por favor, digite seu e-mail.');
-      return false;
-    }
-    if (!senha) {
-      alert('Por favor, digite sua senha.');
-      return false;
-    }
-    if (!confirmSenha) {
-      alert('Por favor, confirme sua senha.');
-      return false;
-    }
-    if (senha !== confirmSenha) {
-      alert('As senhas não coincidem.');
-      return false;
-    }
+  function validarCampos() {
+    if (!name.trim()) return false;
+    if (!email.trim()) return false;
+    if (!senha) return false;
+    if (!confirmSenha) return false;
+    if (senha !== confirmSenha) return false;
     return true;
-  };
+  }
 
-  const handleRegister = async () => {
-    if (!validarCampos()) return;
+  async function handleRegister() {
+    if (!validarCampos()) {
+      alert('Verifique os campos e tente novamente.');
+      return;
+    }
 
     try {
       await usersFirebaseService.createUser(name.trim(), email.trim(), senha);
       router.push('/home');
-    } catch (error) {
+    } catch {
       alert('Falha ao criar o usuário. Tente novamente.');
     }
-  };
+  }
 
   return (
-    <div
-      style={{
-        backgroundColor: '#121212',
-        minHeight: '100vh',
-        padding: '5vw 15px',
-        color: '#D5C1A1',
-        fontFamily: 'Arial, sans-serif',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-      onClick={() => {
-        (document.activeElement as HTMLElement)?.blur();
-      }}
-    >
-      <div style={{ marginBottom: 40, textAlign: 'center' }}>
-        <h1 style={{ fontSize: '3vw', fontWeight: 'bold', color: '#4CAF50', margin: 0 }}>Faça seu cadastro!</h1>
-      </div>
+    <div style={{
+      padding: '5vw 15px',
+      color: '#D5C1A1',
+      fontFamily: 'Arial, sans-serif',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}> 
+      <h1 style={{
+        fontSize: '3vw',
+        fontWeight: 'bold',
+        color: '#4CAF50',
+        marginBottom: 40,
+      }}>
+        Faça seu cadastro!
+      </h1>
 
       <div style={{ width: '100%', maxWidth: 400 }}>
         <TextField
+          id="name"
           value={name}
+          className="w-full"
+          placeholder="Nome"
+          label="Nome"
           onChange={(e) => setName(e.target.value)}
-          labelColor="#4CAF50"
-          iconColor="#D5C1A1"
-          hint="Nome"
-          hintColor="#D5C1A1"
-          fillColor="transparent"
-          cursorColor="#FFFFFF"
-          borderColor="#4CAF50"
-          textColor="#D5C1A1"
-          iconName="person"
-          textType="text"
-          style={{ marginTop: 16 }}
+          required
         />
 
         <TextField
+          id="email"
           value={email}
+          className="w-full"
+          placeholder="E-mail"
+          label="E-mail"
           onChange={(e) => setEmail(e.target.value)}
-          labelColor="#4CAF50"
-          iconColor="#D5C1A1"
-          hint="E-mail"
-          hintColor="#D5C1A1"
-          fillColor="transparent"
-          cursorColor="#FFFFFF"
-          borderColor="#4CAF50"
-          textColor="#D5C1A1"
-          iconName="email"
-          textType="email"
-          style={{ marginTop: 16 }}
+          required
         />
 
         <PasswordField
+          id="senha"
           value={senha}
+          className="w-full"
+          placeholder="Senha"
+          label="Senha"
           onChange={(e) => setSenha(e.target.value)}
-          labelColor="#4CAF50"
-          iconColor="#D5C1A1"
-          hint="Senha"
-          hintColor="#D5C1A1"
-          fillColor="transparent"
-          cursorColor="#FFFFFF"
-          borderColor="#4CAF50"
-          textColor="#D5C1A1"
-          style={{ marginTop: 16 }}
+          required
         />
 
         <PasswordField
+          id="confirmSenha"
           value={confirmSenha}
+          className="w-full"
+          placeholder="Confirmar senha"
+          label="Confirmar senha"
           onChange={(e) => setConfirmSenha(e.target.value)}
-          labelColor="#4CAF50"
-          iconColor="#D5C1A1"
-          hint="Confirmar senha"
-          hintColor="#D5C1A1"
-          fillColor="transparent"
-          cursorColor="#FFFFFF"
-          borderColor="#4CAF50"
-          textColor="#D5C1A1"
-          style={{ marginTop: 16 }}
+          required
         />
 
         <button
@@ -137,14 +101,13 @@ export default function UserRegister(props: UserRegisterProps) {
             marginTop: '2vw',
             width: '100%',
             padding: '14px 0',
-            backgroundColor: '#3E513F',
+            backgroundColor: '#4CAF50',
             color: '#F0F0F0',
             border: 'none',
             borderRadius: 18,
             fontSize: 16,
             cursor: 'pointer',
-          }}
-        >
+          }}>
           Cadastrar
         </button>
 
@@ -155,12 +118,11 @@ export default function UserRegister(props: UserRegisterProps) {
             background: 'none',
             border: 'none',
             color: '#fff',
-            fontSize: 32,
+            fontSize: 20,
             cursor: 'pointer',
             textAlign: 'left',
           }}
-          aria-label="Voltar"
-        >
+          aria-label="Voltar">
           ← Voltar
         </button>
       </div>

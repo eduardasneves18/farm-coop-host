@@ -1,0 +1,7 @@
+.dashboard {
+  color: rgb(255, 255, 255);
+  padding:1%;
+  height: 84vh;
+  overflow: auto;
+  z-index: 999;
+}

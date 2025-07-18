@@ -1,6 +1,5 @@
-import { app } from "@/FirebaseConfig";
+import { auth } from "@/FirebaseConfig";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
   User,
@@ -8,10 +7,9 @@ import {
 } from "firebase/auth";
 
 export class UsersFirebaseService {
-  private auth = getAuth(app);
 
   async getUser(): Promise<User | null> {
-    return this.auth.currentUser;
+    return auth.currentUser;
   }
 
   async createUser(
@@ -21,7 +19,7 @@ export class UsersFirebaseService {
   ): Promise<UserCredential> {
     try {
       const userCredential = await createUserWithEmailAndPassword(
-        this.auth,
+        auth,
         email,
         password
       );

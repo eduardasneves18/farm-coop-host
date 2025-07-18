@@ -1,17 +1,15 @@
 .container {
   min-height: 100vh;
-  background-color: #121212;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px;
 }
 
 .form {
   width: 100%;
   max-width: 400px;
   background-color: #1e1e1e;
-  padding: 32px;
+  padding: 3%;
   border-radius: 12px;
   color: #d5c1a1;
   display: flex;

@@ -1,0 +1,71 @@
+.yes-bank-header {
+  background-color: rgb(0, 0, 0);
+  background: linear-gradient(#1d1d1d, #000000);
+  display: grid;
+  grid-template-columns: 68% 21% 5%;
+  grid-template-rows: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.19);
+  align-items: center;
+  padding: 1%;
+  gap: 3%;
+}
+
+.yes-bank-header-link {
+  font-size: 3.5vh; /* Usar uma unidade relativa para a fonte */
+  display: flex; /* Usar flexbox para garantir que as palavras fiquem lado a lado */
+  align-items: center; /* Alinha as palavras verticalmente */
+}
+
+.yes-bank-header-yes,
+.yes-bank-header-bank {
+  padding-top: 1vh; 
+  padding-bottom: 1vh; 
+  color: inherit; /* Garantir que as cores sejam herdadas */
+}
+
+.yes-bank-header-yes {
+  color: #4caf50; /* Cor de 'Yes' */
+  margin-right: 0; /* Remover qualquer margem direita, para não ter espaçamento entre as palavras */
+}
+
+.yes-bank-header-bank {
+  color: #ffffff; /* Cor de 'Bank' */
+  margin-left: 0; /* Remover qualquer margem esquerda */
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  .yes-bank-header {
+      grid-template-rows: 1fr; /* Coloca os itens em uma única coluna */
+      text-align: center; /* Centraliza o texto */
+  }
+
+  .yes-bank-header-link {
+      font-size: 5vw; /* Reduz o tamanho da fonte em telas menores */
+  }
+}
+
+.yes-bank-header-items {
+  padding: 1vh;
+  border: 1px;
+  border-radius: 10%;
+  border-color: rgb(203, 203, 203);
+  color: rgb(119, 119, 119);
+  display: flex;
+}
+
+.yes-bank-header-icone {
+  padding: 1vh;
+  border: 1px;
+  border-radius: 10%;
+  border-color: rgb(203, 203, 203);
+  color: rgb(119, 119, 119);
+  display: flex;
+}
+
+.yes-bank-header-user-name {  
+  font-size: 90%;
+  color: rgb(255, 255, 255);
+  display: flex;
+  justify-content: flex-end;
+}

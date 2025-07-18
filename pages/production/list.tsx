@@ -1,10 +1,11 @@
 import { ProductionFirebaseService } from '@/services/firebase/production/production_firebase';
 import React, { useEffect, useState } from 'react';
 
+const productionService = new ProductionFirebaseService(); // ✅ instanciado fora do componente
+
 const ProductionList: React.FC = () => {
   const [htmlContent, setHtmlContent] = useState('');
   const [loading, setLoading] = useState(true);
-  const productionService = new ProductionFirebaseService();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +27,7 @@ const ProductionList: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, []); // ✅ Nenhum warning agora
 
   const buildHtmlTable = (rows: string) => `
     <html>

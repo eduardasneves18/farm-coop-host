@@ -2,11 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Header, TextField, NumberField } from 'generic-components-web';
+import { TextField, NumberField } from '../../components/coop-farm-components';
 
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
 import { UserAuthChecker } from '@/utils/userAuthChecker';
+
+interface Produto {
+  id: string;
+  nome: string;
+  quantidade_disponivel: number;
+  unidade_medida: string;
+  preco_venda: number;
+}
 
 export default function RegisterSaleScreen() {
   const router = useRouter();
@@ -20,17 +28,17 @@ export default function RegisterSaleScreen() {
         router.push('/home');
       },
     });
-  }, []);
+  }, [router]);
 
-  const [produto, setProduto] = useState<null>(null);
-  const [produtoId, setProdutoId] = useState('');
-  const [produtoNome, setProdutoNome] = useState('');
-  const [quantidade, setQuantidade] = useState('');
-  const [precoVenda, setPrecoVenda] = useState('');
-  const [valor, setValor] = useState('');
-  const [unidade, setUnidade] = useState('');
-  const [cliente, setCliente] = useState('');
-  const [formaPagamento, setFormaPagamento] = useState('');
+  const [produto, setProduto] = useState<Produto | null>(null);
+  const [produtoId, setProdutoId] = useState<string>('');
+  const [produtoNome, setProdutoNome] = useState<string>('');
+  const [quantidade, setQuantidade] = useState<string>('');
+  const [precoVenda, setPrecoVenda] = useState<string>('');
+  const [valor, setValor] = useState<string>('');
+  const [unidade, setUnidade] = useState<string>('');
+  const [cliente, setCliente] = useState<string>('');
+  const [formaPagamento, setFormaPagamento] = useState<string>('');
 
   const salesService = new SalesFirebaseService();
   const productsService = new ProductsFirebaseService();
@@ -39,51 +47,63 @@ export default function RegisterSaleScreen() {
     const q = parseFloat(quantidade);
     const preco = parseFloat(precoVenda);
     if (!isNaN(q) && !isNaN(preco)) {
-      const total = q * preco;
-      setValor(total.toFixed(2));
+      setValor((q * preco).toFixed(2));
     } else {
       setValor('');
     }
   }, [quantidade, precoVenda]);
 
-  const handleSubmit = async () => {
-    const q = parseFloat(quantidade);
-    const v = parseFloat(valor);
-    if (!produtoId || !produtoNome || !cliente || !unidade || !formaPagamento || isNaN(q) || isNaN(v)) {
-      alert('Preencha todos os campos corretamente.');
-      return;
+const handleSubmit = async () => {
+  const q = parseFloat(quantidade);
+  const v = parseFloat(valor);
+
+  if (
+    !produtoId ||
+    !produtoNome ||
+    !cliente ||
+    !unidade ||
+    !formaPagamento ||
+    isNaN(q) ||
+    isNaN(v)
+  ) {
+    alert('Preencha todos os campos corretamente.');
+    return;
+  }
+
+  try {
+    await salesService.createSale({
+      productId: produtoId,
+      productName: produtoNome,
+      quantity: q,
+      value: v,
+      unit: unidade,
+      clientName: cliente,
+      paymentMethod: formaPagamento,
+    });
+
+    const estoqueAtual = produto?.quantidade_disponivel ?? 0;
+    const novoEstoque = estoqueAtual - q;
+    await productsService.updateProductQuantity(produtoId, novoEstoque);
+
+    alert('Venda registrada com sucesso!');
+
+    setProduto(null);
+    setProdutoId('');
+    setProdutoNome('');
+    setQuantidade('');
+    setPrecoVenda('');
+    setValor('');
+    setUnidade('');
+    setCliente('');
+    setFormaPagamento('');
+  } catch (err) {
+    if (err instanceof Error) {
+      alert(`Erro ao registrar venda: ${err.message}`);
+    } else {
+      alert('Erro desconhecido ao registrar venda.');
     }
-
-    try {
-      await salesService.createSale({
-        productId: produtoId,
-        productName: produtoNome,
-        quantity: q,
-        value: v,
-        unit: unidade,
-        clientName: cliente,
-        paymentMethod: formaPagamento,
-      });
-
-      const estoqueAtual = parseFloat(produto?.quantidade_disponivel?.toString() ?? '0') || 0;
-      const novoEstoque = estoqueAtual - q;
-      await productsService.updateProductQuantity(produtoId, novoEstoque);
-
-      alert('Venda registrada com sucesso!');
-
-      setProduto(null);
-      setProdutoId('');
-      setProdutoNome('');
-      setQuantidade('');
-      setPrecoVenda('');
-      setValor('');
-      setUnidade('');
-      setCliente('');
-      setFormaPagamento('');
-    } catch (err) {
-      alert(`Erro ao registrar venda: ${err}`);
-    }
-  };
+  }
+};
 
   if (!userChecked) return null;
 
@@ -101,6 +121,8 @@ export default function RegisterSaleScreen() {
             const id = e.target.value;
             setProdutoId(id);
             setProdutoNome(id);
+            // Opcional: buscar produto por ID
+            // productsService.getProductById(id).then(p => setProduto(p));
           }}
         />
 

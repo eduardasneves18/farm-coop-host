@@ -1,9 +1,14 @@
 import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
 import { ProductionFirebaseService } from '@/services/firebase/production/production_firebase';
-import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
 import React, { useEffect, useState } from 'react';
+
+// Instancie os serviços fora do componente
+const goalsService = new GoalsFirebaseService();
+const salesService = new SalesFirebaseService();
+const productionService = new ProductionFirebaseService();
+const usersService = new UsersFirebaseService();
 
 type Meta = {
   id?: string;
@@ -19,12 +24,6 @@ type Meta = {
 };
 
 const ListGoalsScreen: React.FC = () => {
-  const goalsService = new GoalsFirebaseService();
-  const productsService = new ProductsFirebaseService();
-  const salesService = new SalesFirebaseService();
-  const productionService = new ProductionFirebaseService();
-  const usersService = new UsersFirebaseService();
-
   const [metas, setMetas] = useState<Meta[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userChecked, setUserChecked] = useState(false);
@@ -42,9 +41,6 @@ const ListGoalsScreen: React.FC = () => {
       const metasCompletas: Meta[] = [];
 
       for (const meta of metasRaw) {
-        const nomeProduto = await productsService.getProductsProps(meta.produto, 'nome');
-        meta.nome_produto = nomeProduto ?? '';
-
         let valorAtual: number | string | null = null;
 
         if (meta.tipo === 'Venda') {
@@ -58,7 +54,6 @@ const ListGoalsScreen: React.FC = () => {
           : Number(valorAtual) || 0;
 
         meta.valor = Number(meta.valor) || 0;
-        meta.quantidade = Number(meta.quantidade) || 0;
 
         metasCompletas.push(meta);
       }
@@ -69,7 +64,7 @@ const ListGoalsScreen: React.FC = () => {
     };
 
     checkUserAndLoad();
-  }, []);
+  }, []); // ✅ Agora seguro, pois os serviços estão fora do componente
 
   const getStatusColor = (meta: Meta) => {
     const valorAtual = meta.valor_atual ?? 0;

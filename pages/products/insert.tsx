@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import {
   TextField,
   NumberField,
-} from 'generic-components-web';
+} from '../../components/coop-farm-components';
 
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
 import { UserAuthChecker } from '@/utils/userAuthChecker';
@@ -19,10 +19,10 @@ const InsertProductScreen: React.FC = () => {
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
         alert('Usuário não autenticado');
-        router.push('/login/login');
+        router.push('/user/login');
       },
     });
-  }, []);
+  }, [router]); // ✅ Correção: adiciona router como dependência
 
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('');
@@ -80,9 +80,10 @@ const InsertProductScreen: React.FC = () => {
       setSellPrice('');
       setProfitMargin('');
       setProfitValue(0);
-    } catch (e: any) {
-      console.error(e);
-      alert('Erro ao cadastrar produto: ' + e.message);
+    } catch (e: unknown) {
+      const error = e as Error;
+      console.error(error);
+      alert('Erro ao cadastrar produto: ' + error.message);
     }
   };
 
@@ -148,9 +149,9 @@ const InsertProductScreen: React.FC = () => {
         label="Margem de Lucro (%)"
         placeholder="Lucro calculado"
         value={profitMargin}
-        className="field"
-        readOnly
-      />
+        className="field" onChange={function (): void {
+          throw new Error('Function not implemented.');
+        } }      />
 
       <button
         onClick={handleSubmit}

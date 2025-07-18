@@ -12,25 +12,40 @@ type Product = {
   preco_venda: number;
 };
 
+type RawProduct = {
+  id?: string;
+  nome?: unknown;
+  quantidade_disponivel?: unknown;
+  unidade_medida?: unknown;
+  preco_venda?: unknown;
+};
+
 const ListProductsScreen: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [userChecked, setUserChecked] = useState(false);
-
-  const productService = new ProductsFirebaseService();
-  const usersService = new UsersFirebaseService();
 
   useEffect(() => {
     const checkUserAndLoad = async () => {
+      const usersService = new UsersFirebaseService();
+      const productService = new ProductsFirebaseService();
+
       const user = await usersService.getUser();
       if (!user) {
         setIsLoading(false);
         return;
       }
 
-      setUserChecked(true);
-      const data = await productService.getProducts();
-      setProducts(data);
+      const rawProducts: RawProduct[] = await productService.getProducts();
+
+      const typedProducts: Product[] = rawProducts.map((p) => ({
+        id: p.id,
+        nome: typeof p.nome === 'string' ? p.nome : '',
+        quantidade_disponivel: Number(p.quantidade_disponivel) || 0,
+        unidade_medida: typeof p.unidade_medida === 'string' ? p.unidade_medida : '',
+        preco_venda: Number(p.preco_venda) || 0,
+      }));
+
+      setProducts(typedProducts);
       setIsLoading(false);
     };
 
@@ -48,9 +63,9 @@ const ListProductsScreen: React.FC = () => {
         {products.length === 0 ? (
           <div style={{ color: 'white', textAlign: 'center' }}>Nenhum produto encontrado.</div>
         ) : (
-          products.map((product, index) => (
+          products.map((product) => (
             <div
-              key={index}
+              key={product.id}
               style={{
                 backgroundColor: '#1e1e1e',
                 borderRadius: 10,
@@ -63,7 +78,7 @@ const ListProductsScreen: React.FC = () => {
               <p>
                 Quantidade total: {product.quantidade_disponivel} {product.unidade_medida}
               </p>
-              <p>Preço por unidade: R$ {product.preco_venda?.toFixed(2)}</p>
+              <p>Preço por unidade: R$ {product.preco_venda.toFixed(2)}</p>
             </div>
           ))
         )}

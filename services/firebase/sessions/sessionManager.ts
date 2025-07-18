@@ -1,35 +1,27 @@
 import { ProductsCacheService } from "@/services/cache/products/product_cache_service";
-import { LoginFirebaseAuthService } from "../users/login/login_firebase";
+import { Auth } from "firebase/auth";
 import clienteStore, { Cliente } from "@/store/client_store";
 
 export class SessionManager {
-  private static readonly sessionTimeout = 10 * 60 * 1000; // 10 minutos em ms
+  private static readonly sessionTimeout = 10 * 60 * 1000;
   private sessionTimer: ReturnType<typeof setTimeout> | null = null;
-
-  private authService: LoginFirebaseAuthService;
+  private auth: Auth;
   private user: Cliente;
   private cacheService = new ProductsCacheService();
 
   constructor(
-    authService: LoginFirebaseAuthService,
+    auth: Auth,
     user: Cliente
   ) {
-    this.authService = authService;
+    this.auth = auth;
     this.user = user;
-
     this.startSessionTimer();
     this.setUser();
   }
 
   private startSessionTimer() {
-    if (this.sessionTimer) {
-      clearTimeout(this.sessionTimer);
-    }
-
-    this.sessionTimer = setTimeout(
-      () => this.handleSessionTimeout(),
-      SessionManager.sessionTimeout
-    );
+    if (this.sessionTimer) clearTimeout(this.sessionTimer);
+    this.sessionTimer = setTimeout(() => this.handleSessionTimeout(), SessionManager.sessionTimeout);
   }
 
   resetSessionTimer() {
@@ -37,11 +29,11 @@ export class SessionManager {
   }
 
   private setUser() {
-    clienteStore.getState().defineCliente(this.user);
+    clienteStore.defineCliente(this.user);
   }
 
   private clearUser() {
-    clienteStore.getState().removeCliente();
+    clienteStore.removeCliente();
   }
 
   private async handleSessionTimeout() {
@@ -51,9 +43,9 @@ export class SessionManager {
   async logout() {
     if (this.sessionTimer) {
       clearTimeout(this.sessionTimer);
+      this.sessionTimer = null;
     }
-
-    await this.authService.signOut();
+    await this.auth.signOut();
     this.clearUser();
     await this.cacheService.clearCache();
   }
@@ -61,6 +53,7 @@ export class SessionManager {
   dispose() {
     if (this.sessionTimer) {
       clearTimeout(this.sessionTimer);
+      this.sessionTimer = null;
     }
   }
 }
