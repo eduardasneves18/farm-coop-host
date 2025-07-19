@@ -1,5 +1,4 @@
 import { User } from "firebase/auth";
-import { DatabaseReference, get, child } from "firebase/database";
 import { UsersFirebaseService } from "../users/user_firebase";
 import { ProductsCacheService } from "@/services/cache/products/product_cache_service";
 import { FirebaseServiceGeneric } from "../FirebaseServiceGeneric";

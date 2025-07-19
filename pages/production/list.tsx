@@ -1,129 +1,91 @@
-import { ProductionFirebaseService } from '@/services/firebase/production/production_firebase';
-import React, { useEffect, useState } from 'react';
+// components/ProductionTable.tsx
 
-const productionService = new ProductionFirebaseService(); // ✅ instanciado fora do componente
+import { ProductionFirebaseService } from "@/services/firebase/production/production_firebase";
+import React, { useEffect, useState } from "react";
+import { Chart } from "react-google-charts";
 
-const ProductionList: React.FC = () => {
-  const [htmlContent, setHtmlContent] = useState('');
+type ProductionItem = {
+  id?: string;
+  produto: string;
+  quantidade: number;
+  unidade_medida: string;
+  status: string;
+  data_estimativa_colheita: string;
+  timestamp: string;
+};
+
+const productionService = new ProductionFirebaseService();
+
+const ProductionTable: React.FC = () => {
+  const [data, setData] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProduction = async () => {
       try {
-        const items = await productionService.getProductionItems();
-        const rows = items.map(item => {
-          const { produto, quantidade, unidade_medida, status, data_estimativa_colheita } = item;
-          return `['${produto}', '${quantidade} ${unidade_medida}', '${status}', '${data_estimativa_colheita ?? '-'}']`;
-        });
+        const items: ProductionItem[] = await productionService.getProductionItems();
 
-        const html = buildHtmlTable(rows.join(',\n'));
-        setHtmlContent(html);
-      } catch (err) {
-        console.error('Erro ao buscar dados de produção:', err);
-        setHtmlContent('<p style="color:red;">Erro ao carregar produções</p>');
+        const tableData = [
+          [
+            "Produto",
+            "Quantidade",
+            "Unidade de Medida",
+            "Status",
+            "Data Estimada de Colheita",
+            "Data de Criação",
+          ],
+          ...items.map((item) => [
+            item.produto,
+            item.quantidade,
+            item.unidade_medida,
+            item.status,
+            item.data_estimativa_colheita,
+            new Date(item.timestamp).toLocaleString("pt-BR"),
+          ]),
+        ];
+
+        setData(tableData);
+      } catch (e) {
+        console.error("Erro ao carregar itens de produção:", e);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []); // ✅ Nenhum warning agora
+    fetchProduction();
+  }, []);
 
-  const buildHtmlTable = (rows: string) => `
-    <html>
-      <head>
-        <style>
-          html, body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom, #2A2A28, #4E5D4D);
-            height: 100%;
-            color: white;
-            font-family: sans-serif;
-          }
-          #scroll_wrapper {
-            overflow: auto;
-            height: 100vh;
-            width: 100vw;
-          }
-          .google-visualization-table-table {
-            background-color: transparent !important;
-            color: white;
-            font-size: 18px;
-            border-spacing: 0;
-            width: 100%;
-          }
-          .google-visualization-table-th {
-            background-color: #2A2A28;
-            color: #A5D6A7 !important;
-            padding: 10px;
-            border: 1px solid #5b5b5b !important;
-          }
-          td {
-            border: 1px solid #555 !important;
-            padding: 10px;
-            text-align: center;
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-          .google-visualization-table-tr-odd {
-            background-color: rgba(76, 175, 80, 0.12) !important;
-          }
-        </style>
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-          google.charts.load('current', { packages: ['table'] });
-          google.charts.setOnLoadCallback(drawTable);
-          function drawTable() {
-            const data = new google.visualization.DataTable();
-            data.addColumn('string', 'Produto');
-            data.addColumn('string', 'Quantidade');
-            data.addColumn('string', 'Status');
-            data.addColumn('string', 'Data Estimada');
-            data.addRows([${rows}]);
-
-            const table = new google.visualization.Table(document.getElementById('table_container'));
-            table.draw(data, {
-              showRowNumber: false,
-              allowHtml: true,
-              cssClassNames: {
-                headerRow: 'google-visualization-table-th',
-                oddTableRow: 'google-visualization-table-tr-odd',
-              }
-            });
-          }
-        </script>
-      </head>
-      <body>
-        <div id="scroll_wrapper">
-          <div id="table_container"></div>
-        </div>
-      </body>
-    </html>
-  `;
+  if (loading) return <p>Carregando dados...</p>;
 
   return (
-    <div style={{ width: '100%', height: '90vh', padding: '1rem', background: '#121212', borderRadius: '8px' }}>
-      <h2 style={{ color: '#A5D6A7', marginBottom: '1rem' }}>Lista de Produções</h2>
-      {loading ? (
-        <p style={{ color: '#ccc' }}>Carregando...</p>
-      ) : (
-        <iframe
-          title="Productions Table"
-          srcDoc={htmlContent}
-          style={{
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            borderRadius: '6px',
-            backgroundColor: 'transparent'
+    <>
+      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Controle de produção</h2>
+      </div>
+      <hr />
+      <div className="production-table-container">
+        <Chart
+          chartType="Table"
+          width="100%"
+          height="auto"
+          data={data}
+          options={{
+            showRowNumber: true,
+            allowHtml: true,
+            sortColumn: 5,
+            sortAscending: false,
+            cssClassNames: {
+              tableCell: "table-cell",
+              headerRow: "table-header",
+              headerCell: "table-header-cell",
+              rowNumberCell: "row-number-cell",
+            },
           }}
         />
-      )}
-    </div>
+      </div>
+    </>
+    
   );
 };
 
-export default ProductionList;
+export default ProductionTable;

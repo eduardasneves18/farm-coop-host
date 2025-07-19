@@ -10,6 +10,7 @@ import {
   TextField,
   NumberField,
   DateField,
+  Dashboard,
 } from '../../components/coop-farm-components';
 import { UserAuthChecker } from '@/utils/userAuthChecker';
 
@@ -84,7 +85,11 @@ export default function InsertGoalScreen() {
   if (!userChecked) return null;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 text-white">
+    <Dashboard>
+      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Controle de Metas</h2>
+      </div>
+      <hr />
       <div className="grid grid-cols-1 gap-4 mt-6">
         <TextField
           id="tipo"
@@ -159,11 +164,17 @@ export default function InsertGoalScreen() {
 
         <button
           onClick={handleSalvar}
-          className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
-        >
+          style={{
+            marginTop: '1.5rem',
+            padding: '0.8rem 1.2rem',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+          }}>
           Cadastrar Meta
         </button>
       </div>
-    </div>
+    </Dashboard>
   );
 }

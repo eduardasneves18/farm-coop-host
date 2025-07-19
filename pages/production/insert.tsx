@@ -110,9 +110,10 @@ export default function RegisterProductionScreen() {
         fontFamily: 'Arial, sans-serif',
       }}
     >
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#D5C1A1' }}>
-        Registrar Produção
-      </h1>
+      <div>
+        <h2>Registro de produção</h2>
+      </div>
+      <hr />
 
       <div style={{ marginBottom: 10 }}>
         <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Produto</label>
@@ -204,7 +205,7 @@ export default function RegisterProductionScreen() {
           cursor: 'pointer',
         }}
       >
-        Cadastrar Produção
+        Registrar
       </button>
     </div>
   );

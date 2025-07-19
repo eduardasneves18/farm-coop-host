@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
+import { Dashboard } from '../../components/coop-farm-components';
 
 type Product = {
   id?: string;
@@ -12,79 +13,98 @@ type Product = {
   preco_venda: number;
 };
 
-type RawProduct = {
-  id?: string;
-  nome?: unknown;
-  quantidade_disponivel?: unknown;
-  unidade_medida?: unknown;
-  preco_venda?: unknown;
+type State = {
+  products: Product[];
+  isLoading: boolean;
+  userChecked: boolean;
 };
 
-const ListProductsScreen: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default class ListProductsScreen extends React.Component<object, State> {
+  private productService = new ProductsFirebaseService();
+  private userService = new UsersFirebaseService();
 
-  useEffect(() => {
-    const checkUserAndLoad = async () => {
-      const usersService = new UsersFirebaseService();
-      const productService = new ProductsFirebaseService();
+  constructor(props: object) {
+    super(props);
+    this.state = {
+      products: [],
+      isLoading: true,
+      userChecked: false,
+    };
+  }
 
-      const user = await usersService.getUser();
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
+  componentDidMount() {
+    this.checkUser();
+  }
 
-      const rawProducts: RawProduct[] = await productService.getProducts();
+  async checkUser() {
+    const user = await this.userService.getUser();
+    if (user) {
+      this.setState({ userChecked: true });
+      this.loadProducts();
+    } else {
+      console.warn('Usuário não autenticado');
+      this.setState({ isLoading: false });
+    }
+  }
 
-      const typedProducts: Product[] = rawProducts.map((p) => ({
+  async loadProducts() {
+    try {
+      const rawProducts = await this.productService.getProducts();
+      const typedProducts: Product[] = rawProducts.map((p: any) => ({
         id: p.id,
         nome: typeof p.nome === 'string' ? p.nome : '',
         quantidade_disponivel: Number(p.quantidade_disponivel) || 0,
         unidade_medida: typeof p.unidade_medida === 'string' ? p.unidade_medida : '',
         preco_venda: Number(p.preco_venda) || 0,
       }));
-
-      setProducts(typedProducts);
-      setIsLoading(false);
-    };
-
-    checkUserAndLoad();
-  }, []);
-
-  if (isLoading) {
-    return <div style={{ textAlign: 'center', marginTop: 40 }}>Carregando...</div>;
+      this.setState({ products: typedProducts, isLoading: false });
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+      this.setState({ isLoading: false });
+    }
   }
 
-  return (
-    <div style={{ padding: 16, color: '#D5C1A1', fontFamily: 'Arial, sans-serif' }}>
-      <h2 style={{ fontSize: '1.5rem' }}>Produtos</h2>
-      <div style={{ marginTop: 16 }}>
-        {products.length === 0 ? (
-          <div style={{ color: 'white', textAlign: 'center' }}>Nenhum produto encontrado.</div>
-        ) : (
-          products.map((product) => (
-            <div
-              key={product.id}
-              style={{
-                backgroundColor: '#1e1e1e',
-                borderRadius: 10,
-                padding: 16,
-                marginBottom: 12,
-                color: 'white',
-              }}
-            >
-              <h3 style={{ fontSize: '1.2rem', marginBottom: 8 }}>{product.nome}</h3>
-              <p>
-                Quantidade total: {product.quantidade_disponivel} {product.unidade_medida}
-              </p>
-              <p>Preço por unidade: R$ {product.preco_venda.toFixed(2)}</p>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-};
+  render() {
+    const { products, isLoading } = this.state;
 
-export default ListProductsScreen;
+    return (
+      <Dashboard>
+          <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2>Lista de Produtos</h2>
+          </div>
+          <hr />
+
+          {isLoading ? (
+            <p style={{ color: 'white', textAlign: 'center' }}>Carregando produtos...</p>
+          ) : (
+            <div className="tabela-produtos" >
+              {products.length > 0 ? (
+                <table>
+                  <thead>
+                    <tr style={{ backgroundColor: '#2e2e2e', color: '#D5C1A1' }}>
+                      <th>Nome</th>
+                      <th>Quantidade</th>
+                      <th>Unidade</th>
+                      <th>Preço de Venda</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.map((product) => (
+                      <tr key={product.id} style={{ borderBottom: '1px solid #444', color: 'white' }}>
+                        <td style={{ padding: 8 }}>{product.nome}</td>
+                        <td style={{ padding: 8 }}>{product.quantidade_disponivel}</td>
+                        <td style={{ padding: 8 }}>{product.unidade_medida}</td>
+                        <td style={{ padding: 8 }}>R$ {product.preco_venda.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p style={{ color: 'white' }}>Nenhum produto encontrado.</p>
+              )}
+            </div>
+          )}
+      </Dashboard>
+    );
+  }
+}

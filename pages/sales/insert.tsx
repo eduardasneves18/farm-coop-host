@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { TextField, NumberField } from '../../components/coop-farm-components';
+import { TextField, NumberField, Dashboard } from '../../components/coop-farm-components';
 
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
@@ -108,7 +108,11 @@ const handleSubmit = async () => {
   if (!userChecked) return null;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 text-white">
+    <Dashboard>
+      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Cadastro de vendas</h2>
+      </div>
+      <hr /> 
       <div className="grid grid-cols-1 gap-4 mt-6">
         <TextField
           id="produto"
@@ -176,13 +180,20 @@ const handleSubmit = async () => {
           onChange={(e) => setFormaPagamento(e.target.value)}
         />
 
-        <button
-          onClick={handleSubmit}
-          className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
-        >
-          Registrar Venda
-        </button>
+      <button
+        onClick={handleSubmit}
+        style={{
+          marginTop: '1.5rem',
+          padding: '0.8rem 1.2rem',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+        }}
+      >
+        Registrar
+      </button>
       </div>
-    </div>
+    </Dashboard>
   );
 }

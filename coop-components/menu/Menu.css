@@ -3,13 +3,16 @@ ul {
 }
 
 .itens-menu-lateral {
-  padding: 1vh;
-  display: flex;
-  flex-direction: column;
+  width: 250px;
+  padding: 1rem;
+  list-style: none;
+  margin: 0;
+  background-color: #151515;
 }
 
 .item {
   padding: 10px;
   display: flex;
   justify-content: center;
+  color: #d5c1a1;
 }

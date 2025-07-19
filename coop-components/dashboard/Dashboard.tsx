@@ -4,9 +4,9 @@ import { DashboardProps } from '../../types/dashboard/DashboardProps';
 
 const Dashboard:React.FC<DashboardProps> = ({ children, className })  => {
     return (
-      <main className="dashboard">
-          {children}
-      </main>
+      <div className={className}>
+        {children}
+      </div>
     )
 }
 

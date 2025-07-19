@@ -72,7 +72,7 @@ const InsertProductScreen: React.FC = () => {
 
       alert('Produto cadastrado com sucesso!');
 
-      // Resetar campos
+
       setName('');
       setUnit('');
       setQuantity('');
@@ -90,8 +90,11 @@ const InsertProductScreen: React.FC = () => {
   if (!userChecked) return null;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 600, margin: 'auto' }}>
-      <h1 style={{ margin: '2rem 0 1rem' }}>Cadastro de Produto</h1>
+    <div>
+      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Cadastro de produtos</h2>
+      </div>
+      <hr />
 
       <TextField
         id="name"

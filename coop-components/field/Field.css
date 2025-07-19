@@ -33,9 +33,11 @@ input::placeholder {
   border-radius: 5px;
   background-color: transparent;
   height: 3.8vh;
+  width: '100%';
+  padding: 1%; 
 }
 
 select {
   padding: 1%;
-  padding-left: 10px;
+  padding-left: 3%;
 }

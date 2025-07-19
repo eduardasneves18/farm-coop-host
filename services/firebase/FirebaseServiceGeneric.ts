@@ -1,6 +1,16 @@
-// services/firebase/FirebaseServiceGeneric.ts
 import { database } from "../../FirebaseConfig";
-import { ref, push, set, update, remove, get, query, orderByChild, equalTo } from "firebase/database";
+import {
+  ref,
+  push,
+  set,
+  update,
+  remove,
+  get,
+  query,
+  orderByChild,
+  equalTo,
+  DataSnapshot,
+} from "firebase/database";
 
 export class FirebaseServiceGeneric {
   private db = database;
@@ -9,12 +19,12 @@ export class FirebaseServiceGeneric {
     return ref(this.db, path);
   }
 
-  async create(path: string, data: Record<string, any>) {
+  async create(path: string, data: Record<string, unknown>) {
     const newRef = push(ref(this.db, path));
     await set(newRef, data);
   }
 
-  async update(path: string, id: string, data: Record<string, any>) {
+  async update(path: string, id: string, data: Record<string, unknown>) {
     const recordRef = ref(this.db, `${path}/${id}`);
     await update(recordRef, data);
   }
@@ -24,17 +34,24 @@ export class FirebaseServiceGeneric {
     await remove(recordRef);
   }
 
-  async fetch(path: string) {
+  /**
+   * ✅ Corrigido: agora retorna o DataSnapshot completo.
+   * Isso permite o uso de .val() e .exists() fora desta função.
+   */
+  async fetch(path: string): Promise<DataSnapshot> {
     const recordRef = ref(this.db, path);
-    const snapshot = await get(recordRef);
-    return snapshot.exists() ? snapshot.val() : null;
+    return await get(recordRef);
   }
 
-  async getWhere(path: string, field: string, value: string): Promise<Array<Record<string, any>>> {
+  async getWhere(
+    path: string,
+    field: string,
+    value: string
+  ): Promise<Array<Record<string, unknown>>> {
     const q = query(ref(this.db, path), orderByChild(field), equalTo(value));
     const snapshot = await get(q);
 
-    const result: Array<Record<string, any>> = [];
+    const result: Array<Record<string, unknown>> = [];
 
     if (snapshot.exists()) {
       const data = snapshot.val();

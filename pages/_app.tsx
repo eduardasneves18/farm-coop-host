@@ -19,9 +19,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     { label: 'Página inicial', path: '/home' },
     { label: 'Cadastro de produtos', path: '/products/insert' },
     { label: 'Lista de produtos', path: '/products/list' },
-    { label: 'Gestão da produção', path: '/products/list' },
-    { label: 'Análise de intens da prdução', path: '/products/list' },
+    { label: 'Registro de produção', path: '/production/insert' },
+    { label: 'Controle da produção', path: '/production/list' },
     { label: 'Cadastro de metas', path: '/goals/insert' },
+    { label: 'Gestão de metas', path: '/goals/list' },
     { label: 'Cadastro de vendas', path: '/sales/insert' },
     { label: 'Lista de vendas', path: '/sales/list' },
     
@@ -59,7 +60,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </div>
       <div className='central-content'>
         <Menu items={menuItems} />
-        <main style={{ padding: '2rem' }}>
+        <main>
           <Dashboard>
             <Component {...pageProps} />
           </Dashboard>

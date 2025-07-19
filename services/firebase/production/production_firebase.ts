@@ -56,10 +56,10 @@ export class ProductionFirebaseService {
     let items = (await this.cacheService.get()) as ProductionItem[];
 
     if (!items || items.length === 0) {
-      const snapshot = await this.firebaseService.fetch("production");
+      const snapshot = await this.firebaseService.fetch("productions");
       items = [];
 
-      if (snapshot?.exists?.()) {
+      if (snapshot && snapshot.val()) {
         const data = snapshot.val() as Record<string, any>;
 
         for (const key in data) {

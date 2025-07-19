@@ -30,11 +30,9 @@ const Header: React.FC<HeaderProps> = ({
       />
       <UserName name={userName} />
       <div>
-        {/* <a href="/home" className="yes-bank-header-link"> */}
           <Link href="/home" className="yes-bank-header-link">
-            <FontAwesomeIcon icon={faUser} />
+            <FontAwesomeIcon icon={faUser}/>
           </Link>
-        {/* </a> */}
       </div>
     </>
   );

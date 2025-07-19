@@ -4,7 +4,6 @@ import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
 import React, { useEffect, useState } from 'react';
 
-// Instancie os serviços fora do componente
 const goalsService = new GoalsFirebaseService();
 const salesService = new SalesFirebaseService();
 const productionService = new ProductionFirebaseService();
@@ -64,7 +63,7 @@ const ListGoalsScreen: React.FC = () => {
     };
 
     checkUserAndLoad();
-  }, []); // ✅ Agora seguro, pois os serviços estão fora do componente
+  }, []);
 
   const getStatusColor = (meta: Meta) => {
     const valorAtual = meta.valor_atual ?? 0;
