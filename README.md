@@ -1,40 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Coop-farm (web)
 
-## Getting Started
+**Coop-farm** é um aplicativo web de uma cooperativa de fazendas, desenvolvido em **React** com **Next.js**. O objetivo é permitir que os usuários registrem e acompanhem os produtos em produção, colheita e estoque para venda. O foco está na **simplicidade** e nas funcionalidades essenciais para o gerenciamento de produtos agrícolas.
 
-First, run the development server:
+## Funcionalidades
+
+O sistema possui uma estrutura de login/logout que garante a segurança dos dados do usuário. Além disso:
+
+- **Cadastro de produtos:** permite registrar novos produtos.
+- **Lista de produtos:** o usuário pode consultar todos os produtos cadastrados.
+- **Dashboard de vendas:** visualização gráfica das vendas com possibilidade de ordenação.
+- **Cadastro de vendas:** permite registrar a venda de um produto.
+- **Gestão de produção:** possibilita cadastrar o estágio atual de um produto (ex: colheita).
+- **Dashboard de produção:** visualiza todos os itens da produção em uma tabela simples e informativa.
+- **Cadastro de metas:** registrar metas de venda ou produção.
+- **Listagem de metas:** lista metas cadastradas e seus status.
+- **Notificações de metas:** alerta quando metas forem atingidas ou expiradas.
+- **Lazy loading:** paginação implementada para melhor desempenho em listas longas.
+
+## Tecnologias Utilizadas
+
+- **Framework:** Next.js (React)
+- **Linguagem de programação:** TypeScript
+- **Gerenciamento de estado:** MobX e Zustand
+- **Autenticação:** Firebase Auth (login/logout)
+- **Gráficos e dashboards:** [react-google-charts](https://www.npmjs.com/package/react-google-charts)
+- **Módulos remotos:** Module Federation via [`@module-federation/nextjs-mf`](https://www.npmjs.com/package/@module-federation/nextjs-mf)
+- **Programação reativa:** Utilização do conceito reativo com MobX, garantindo que a UI reaja automaticamente às mudanças de estado.
+
+## Pré-requisitos
+
+Antes de rodar o projeto, é necessário ter **Node.js** e **npm** instalados.  
+Você pode baixá-los em: [https://nodejs.org/](https://nodejs.org/)
+
+## Instalação
+
+Clone o repositório do projeto:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/eduardasneves18/farm-coop-host.git
 ```
+Navegue até a pasta do projeto:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+cd coop-farm-host
+```
+Instale as dependências:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+npm ci
+```
+Execute o aplicativo:
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```bash
+npm run edv
+```
+O app será iniciado em um navegador web.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Licença
+Este projeto é de livre uso para fins de estudo e demonstração.
