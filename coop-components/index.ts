@@ -12,6 +12,8 @@ import Button from './button/Button';
 import LoginButton from './button/LoginButton';
 import FilterIconButton from "./button/FilterIconButton";
 import NextLinkWrapper from "./nextLink/nextLinkWrapper";
+import UnitLookupField from "./field/unitLookupField";
+import ProductLookupField from "./field/ProductLookupField";
 
 export {
   DateField,
@@ -27,5 +29,7 @@ export {
   Button,
   LoginButton,
   FilterIconButton,
-  NextLinkWrapper
+  NextLinkWrapper,
+  UnitLookupField,
+  ProductLookupField
 };

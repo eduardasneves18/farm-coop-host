@@ -3,19 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
-import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
-
 import {
   TextField,
   NumberField,
   DateField,
   Dashboard,
+  UnitLookupField,
+  ProductLookupField,
+  LookupField,
 } from '../../components/coop-farm-components';
-import { UserAuthChecker } from '@/utils/userAuthChecker';
+
+import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
+import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
+import { UserAuthChecker } from '@/utils/auth/userAuthChecker';
+import { Product } from '@/types/field/product/ProductFireldProps';
 
 const goalService = new GoalsFirebaseService();
 const userService = new UsersFirebaseService();
+const goalsOptions = ['Venda', 'Produção']
 
 export default function InsertGoalScreen() {
   const router = useRouter();
@@ -26,26 +31,32 @@ export default function InsertGoalScreen() {
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
         alert('Usuário não autenticado');
-        router.push('/home');
+        router.push('/user/login');
       },
     });
-  }, [router]); // Adiciona `router` nas dependências conforme o warning
+  }, [router]);
 
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [nome, setNome] = useState('');
   const [tipo, setTipo] = useState('');
   const [valor, setValor] = useState('');
   const [unidade, setUnidade] = useState('');
   const [quantidade, setQuantidade] = useState('');
   const [prazo, setPrazo] = useState('');
-  const [produtoId, setProdutoId] = useState('');
 
-  // Definindo um tipo específico para erro no catch para evitar `any`
-  type ErrorWithMessage = {
-    message: string;
-  };
+  useEffect(() => {
+    const q = parseFloat(quantidade);
+    const preco = selectedProduct?.preco_venda ?? NaN;
+
+    if (!isNaN(q) && !isNaN(preco)) {
+      setValor((q * preco).toFixed(2));
+    } else {
+      setValor('');
+    }
+  }, [quantidade, selectedProduct]);
 
   const handleSalvar = async () => {
-    if (!nome || !tipo || !valor || !unidade || !quantidade || !prazo || !produtoId) {
+    if (!nome || !tipo || !valor || !unidade || !quantidade || !prazo || !selectedProduct) {
       alert('Preencha todos os campos obrigatórios.');
       return;
     }
@@ -62,23 +73,20 @@ export default function InsertGoalScreen() {
         unidade,
         quantidade: parseFloat(quantidade),
         prazo,
-        produto: produtoId,
+        produto: selectedProduct.productId,
       });
 
       alert('Meta registrada com sucesso!');
 
-      // Resetar campos
+      setSelectedProduct(null);
       setNome('');
       setTipo('');
       setValor('');
       setUnidade('');
       setQuantidade('');
       setPrazo('');
-      setProdutoId('');
-    } catch (e) {
-      // Faz um type guard para erro com mensagem
-      const error = e as ErrorWithMessage;
-      alert(`Erro ao salvar meta: ${error.message || 'Erro desconhecido'}`);
+    } catch (e: any) {
+      alert(`Erro ao salvar meta: ${e.message || 'Erro desconhecido'}`);
     }
   };
 
@@ -86,29 +94,33 @@ export default function InsertGoalScreen() {
 
   return (
     <Dashboard>
-      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Controle de Metas</h2>
+      <div
+        className="header-extrato"
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
+        <h2>Cadastro de Meta</h2>
       </div>
       <hr />
       <div className="grid grid-cols-1 gap-4 mt-6">
-        <TextField
+        <LookupField
           id="tipo"
           label="Tipo da Meta"
-          placeholder="Ex: Produção ou Venda"
-          className="w-full"
+          options={goalsOptions}
           value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          className="w-full"
           required
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTipo(e.target.value)}
+          placeholder="Selecione o tipo da meta"
         />
 
-        <TextField
+        <ProductLookupField
           id="produto"
-          label="Produto"
-          placeholder="ID do Produto"
+          value={selectedProduct}
+          onChange={(p) => {
+            setSelectedProduct(p);
+            setUnidade(p?.unidade_medida ?? '');
+          }}
           className="w-full"
-          value={produtoId}
-          required
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProdutoId(e.target.value)}
         />
 
         <TextField
@@ -118,8 +130,29 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={nome}
           required
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNome(e.target.value)}
+          onChange={(e) => setNome(e.target.value)}
         />
+
+        <div className="flex gap-4">
+          <UnitLookupField
+            id="unidade"
+            label="Unidade de Medida"
+            className="w-full"
+            value={unidade}
+            onChange={() => {}}
+            readOnly={true}
+            placeholder='Selecione uma unidade de medida'
+          />
+          <NumberField
+            id="quantidade"
+            label={`Quantidade ${unidade ? `(${unidade})` : ''}`}
+            placeholder="0"
+            className="w-full"
+            value={quantidade}
+            required
+            onChange={(e) => setQuantidade(e.target.value)}
+          />
+        </div>
 
         <NumberField
           id="valor"
@@ -127,30 +160,10 @@ export default function InsertGoalScreen() {
           placeholder="0.00"
           className="w-full"
           value={valor}
+          onChange={() => {}}
+          readOnly={true}
           required
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValor(e.target.value)}
         />
-
-        <div className="flex gap-4">
-          <TextField
-            id="unidade"
-            label="Unidade"
-            placeholder="kg, l, g, dz..."
-            className="w-full"
-            value={unidade}
-            required
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUnidade(e.target.value)}
-          />
-          <NumberField
-            id="quantidade"
-            label="Quantidade"
-            placeholder="0"
-            className="w-full"
-            value={quantidade}
-            required
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuantidade(e.target.value)}
-          />
-        </div>
 
         <DateField
           id="prazo"
@@ -159,7 +172,7 @@ export default function InsertGoalScreen() {
           className="w-full"
           value={prazo}
           required
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrazo(e.target.value)}
+          onChange={(e) => setPrazo(e.target.value)}
         />
 
         <button
@@ -171,7 +184,8 @@ export default function InsertGoalScreen() {
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-          }}>
+          }}
+        >
           Cadastrar Meta
         </button>
       </div>

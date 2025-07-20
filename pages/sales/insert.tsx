@@ -2,137 +2,140 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { TextField, NumberField, Dashboard } from '../../components/coop-farm-components';
+import {
+  TextField,
+  NumberField,
+  Dashboard,
+  UnitLookupField,
+  ProductLookupField,
+  DateField,
+} from '../../components/coop-farm-components';
 
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
-import { UserAuthChecker } from '@/utils/userAuthChecker';
-
-interface Produto {
-  id: string;
-  nome: string;
-  quantidade_disponivel: number;
-  unidade_medida: string;
-  preco_venda: number;
-}
+import { UserAuthChecker } from '@/utils/auth/userAuthChecker';
+import { Product } from '@/types/field/product/ProductFireldProps';
+import { format } from 'date-fns';
+import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
 
 export default function RegisterSaleScreen() {
   const router = useRouter();
   const [userChecked, setUserChecked] = useState(false);
+
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quantidade, setQuantidade] = useState<string>('');
+  const [valor, setValor] = useState<string>('');
+  const [unit, setUnit] = useState<string>('');
+  const [cliente, setCliente] = useState<string>('');
+  const [formaPagamento, setFormaPagamento] = useState<string>('');
+  const [dataVenda, setDataVenda] = useState<string>(() =>
+    format(new Date(), 'yyyy-MM-dd')
+  );
+
+  const salesService = new SalesFirebaseService();
+  const goalService = new GoalsFirebaseService();
+  const productsService = new ProductsFirebaseService();
 
   useEffect(() => {
     UserAuthChecker.check({
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
         alert('Usuário não autenticado');
-        router.push('/home');
+        router.push('/user/login');
       },
     });
   }, [router]);
 
-  const [produto, setProduto] = useState<Produto | null>(null);
-  const [produtoId, setProdutoId] = useState<string>('');
-  const [produtoNome, setProdutoNome] = useState<string>('');
-  const [quantidade, setQuantidade] = useState<string>('');
-  const [precoVenda, setPrecoVenda] = useState<string>('');
-  const [valor, setValor] = useState<string>('');
-  const [unidade, setUnidade] = useState<string>('');
-  const [cliente, setCliente] = useState<string>('');
-  const [formaPagamento, setFormaPagamento] = useState<string>('');
-
-  const salesService = new SalesFirebaseService();
-  const productsService = new ProductsFirebaseService();
-
   useEffect(() => {
     const q = parseFloat(quantidade);
-    const preco = parseFloat(precoVenda);
+    const preco = selectedProduct?.preco_venda ?? NaN;
+
     if (!isNaN(q) && !isNaN(preco)) {
       setValor((q * preco).toFixed(2));
     } else {
       setValor('');
     }
-  }, [quantidade, precoVenda]);
+  }, [quantidade, selectedProduct]);
 
-const handleSubmit = async () => {
-  const q = parseFloat(quantidade);
-  const v = parseFloat(valor);
+  const handleSubmit = async () => {
+    const q = parseFloat(quantidade);
+    const v = parseFloat(valor);
 
-  if (
-    !produtoId ||
-    !produtoNome ||
-    !cliente ||
-    !unidade ||
-    !formaPagamento ||
-    isNaN(q) ||
-    isNaN(v)
-  ) {
-    alert('Preencha todos os campos corretamente.');
-    return;
-  }
-
-  try {
-    await salesService.createSale({
-      productId: produtoId,
-      productName: produtoNome,
-      quantity: q,
-      value: v,
-      unit: unidade,
-      clientName: cliente,
-      paymentMethod: formaPagamento,
-    });
-
-    const estoqueAtual = produto?.quantidade_disponivel ?? 0;
-    const novoEstoque = estoqueAtual - q;
-    await productsService.updateProductQuantity(produtoId, novoEstoque);
-
-    alert('Venda registrada com sucesso!');
-
-    setProduto(null);
-    setProdutoId('');
-    setProdutoNome('');
-    setQuantidade('');
-    setPrecoVenda('');
-    setValor('');
-    setUnidade('');
-    setCliente('');
-    setFormaPagamento('');
-  } catch (err) {
-    if (err instanceof Error) {
-      alert(`Erro ao registrar venda: ${err.message}`);
-    } else {
-      alert('Erro desconhecido ao registrar venda.');
+    if (
+      !selectedProduct ||
+      !cliente ||
+      !unit ||
+      !formaPagamento ||
+      !dataVenda ||
+      isNaN(q) ||
+      isNaN(v)
+    ) {
+      alert('Preencha todos os campos corretamente.');
+      return;
     }
-  }
-};
+
+    try {
+      await salesService.createSale({
+        productId: selectedProduct.productId,
+        productName: selectedProduct.nome,
+        quantity: q,
+        value: v,
+        unit: unit,
+        clientName: cliente,
+        paymentMethod: formaPagamento,
+        date: dataVenda,
+      });
+
+      await goalService.VerifyGoals(selectedProduct.productId, v, dataVenda);
+
+      const estoqueAtual = selectedProduct.quantidade_disponivel ?? 0;
+      const novoEstoque = estoqueAtual - q;
+      await productsService.updateProductQuantity(selectedProduct.productId, novoEstoque);
+
+      alert('Venda registrada com sucesso!');
+
+      setSelectedProduct(null);
+      setQuantidade('');
+      setValor('');
+      setUnit('');
+      setCliente('');
+      setFormaPagamento('');
+      setDataVenda(format(new Date(), 'yyyy-MM-dd'));
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(`Erro ao registrar venda: ${err.message}`);
+      } else {
+        alert('Erro desconhecido ao registrar venda.');
+      }
+    }
+  };
 
   if (!userChecked) return null;
 
   return (
     <Dashboard>
-      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        className="header-extrato"
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
         <h2>Cadastro de vendas</h2>
       </div>
-      <hr /> 
+      <hr />
       <div className="grid grid-cols-1 gap-4 mt-6">
-        <TextField
+        <ProductLookupField
           id="produto"
-          label="Produto (temporário)"
-          placeholder="ID do Produto"
-          className="w-full"
-          value={produtoId}
-          required
-          onChange={(e) => {
-            const id = e.target.value;
-            setProdutoId(id);
-            setProdutoNome(id);
-            // Opcional: buscar produto por ID
-            // productsService.getProductById(id).then(p => setProduto(p));
+          value={selectedProduct}
+          onChange={(p) => {
+            setSelectedProduct(p);
+            setUnit(p?.unidade_medida ?? '');
+            setQuantidade('');
           }}
+          className="w-full"
         />
 
         <NumberField
           id="quantidade"
-          label={`Quantidade ${unidade ? `(${unidade})` : ''}`}
+          label={`Quantidade ${unit ? `(${unit})` : ''}`}
           placeholder="0"
           className="w-full"
           value={quantidade}
@@ -148,6 +151,7 @@ const handleSubmit = async () => {
           value={valor}
           required
           onChange={() => {}}
+          readOnly={true}
         />
 
         <TextField
@@ -160,14 +164,12 @@ const handleSubmit = async () => {
           onChange={(e) => setCliente(e.target.value)}
         />
 
-        <TextField
+        <UnitLookupField
           id="unidade"
-          label="Unidade"
-          placeholder="kg, l, g..."
-          className="w-full"
-          value={unidade}
-          required
-          onChange={(e) => setUnidade(e.target.value)}
+          value={unit}
+          onChange={() => {}}
+          readOnly={true}
+          placeholder='Selecione uma unidade de medida'
         />
 
         <TextField
@@ -180,19 +182,29 @@ const handleSubmit = async () => {
           onChange={(e) => setFormaPagamento(e.target.value)}
         />
 
-      <button
-        onClick={handleSubmit}
-        style={{
-          marginTop: '1.5rem',
-          padding: '0.8rem 1.2rem',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-        }}
-      >
-        Registrar
-      </button>
+        <DateField
+          id="data-venda"
+          label="Data da Venda"
+          placeholder="Selecione a data"
+          value={dataVenda}
+          onChange={(e) => setDataVenda(e.target.value)}
+          className="w-full"
+          required
+        />
+
+        <button
+          onClick={handleSubmit}
+          style={{
+            marginTop: '1.5rem',
+            padding: '0.8rem 1.2rem',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+          }}
+        >
+          Registrar
+        </button>
       </div>
     </Dashboard>
   );

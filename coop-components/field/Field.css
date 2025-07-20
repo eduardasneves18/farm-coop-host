@@ -37,7 +37,21 @@ input::placeholder {
   padding: 1%; 
 }
 
+option{
+  color: #fff;
+  border: 0.5px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #0a0a0a;
+  border-radius: 5px;
+  background-color: #292929;
+  height: 3.8vh;
+  width: '100%';
+  padding: 1%; 
+}
+
 select {
   padding: 1%;
   padding-left: 3%;
+  color: #0a0a0a;
 }

@@ -170,18 +170,27 @@ h2 {
 
 .table-header-cell {
   font-weight: bold;
-  background-color: #171717 !important;
+  background-color: #2e2e2e !important;
   color: white !important;
+  border: none !important;
+  white-space: nowrap;
+  padding: 4%;
 }
 
 
 .table-cell {
   background-color: #1f1f1f !important;
   color: white !important;
+  border: none !important;
+  white-space: nowrap;
 }
 
 .google-visualization-table-table{
   background-color: transparent;
+}
+
+.google-visualization-table-table *{
+  padding: 12px;
 }
 
 .row-number-cell {

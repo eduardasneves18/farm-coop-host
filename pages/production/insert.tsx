@@ -1,28 +1,32 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import router from 'next/router';
 
-import { UserAuthChecker } from '@/utils/userAuthChecker';
+import { UserAuthChecker } from '@/utils/auth/userAuthChecker';
 import { FirebaseServiceGeneric } from '@/services/firebase/FirebaseServiceGeneric';
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
 
-import { DateField, NumberField } from '../../components/coop-farm-components';
-
-interface Product {
-  productId: string;
-  unidade_medida: string;
-  [key: string]: unknown;
-}
+import {
+  DateField,
+  NumberField,
+  UnitLookupField,
+  Dashboard,
+  ProductLookupField,
+  LookupField,
+} from '../../components/coop-farm-components';
+import { Product } from '@/types/field/product/ProductFireldProps';
 
 const statusOptions = ['Aguardando', 'Em Produção', 'Colhido'];
 
 export default function RegisterProductionScreen() {
   const [userChecked, setUserChecked] = useState(false);
 
-  const [produtoSelecionado, setProdutoSelecionado] = useState<Product | null>(null);
-  const [quantidade, setQuantidade] = useState<string>('');
-  const [unidadeSelecionada, setUnidadeSelecionada] = useState<string | null>(null);
-  const [dataEstimada, setDataEstimada] = useState<string>('');
-  const [statusSelecionado, setStatusSelecionado] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quantidade, setQuantidade] = useState('');
+  const [unidadeSelecionada, setUnidadeSelecionada] = useState('');
+  const [dataEstimada, setDataEstimada] = useState('');
+  const [statusSelecionado, setStatusSelecionado] = useState('');
 
   const firebaseService = new FirebaseServiceGeneric();
   const usersService = new UsersFirebaseService();
@@ -32,22 +36,22 @@ export default function RegisterProductionScreen() {
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
         alert('Usuário não autenticado');
-        router.push('/home');
+        router.push('/user/login');
       },
     });
   }, []);
 
   const limparCampos = () => {
-    setProdutoSelecionado(null);
+    setSelectedProduct(null);
     setQuantidade('');
-    setUnidadeSelecionada(null);
+    setUnidadeSelecionada('');
     setDataEstimada('');
-    setStatusSelecionado(null);
+    setStatusSelecionado('');
   };
 
   const validarCampos = () => {
     return (
-      produtoSelecionado &&
+      selectedProduct &&
       quantidade &&
       parseFloat(quantidade) > 0 &&
       unidadeSelecionada &&
@@ -68,7 +72,7 @@ export default function RegisterProductionScreen() {
 
       await firebaseService.create('productions', {
         usuario_id: user.uid,
-        produto: produtoSelecionado?.productId,
+        produto: selectedProduct?.productId,
         quantidade: parseFloat(quantidade),
         unidade: unidadeSelecionada,
         data_estimada: statusSelecionado === 'Colhido' ? null : dataEstimada,
@@ -86,127 +90,88 @@ export default function RegisterProductionScreen() {
 
   if (!userChecked) {
     return (
-      <div
-        style={{
-          width: '100vw',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+      <div className="w-screen h-screen flex justify-center items-center">
         <div>Carregando...</div>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: 600,
-        margin: 'auto',
-        padding: 20,
-        color: '#D5C1A1',
-        fontFamily: 'Arial, sans-serif',
-      }}
-    >
-      <div>
-        <h2>Registro de produção</h2>
-      </div>
-      <hr />
+    <Dashboard>
+      <div style={{ maxWidth: 700, margin: 'auto', padding: 24 }}>
+        <h2>Registro de Produção</h2>
+        <hr className="my-4" />
 
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Produto</label>
-        <select
-          value={produtoSelecionado?.productId || ''}
-          onChange={(e) => {
-            const selectedId = e.target.value;
-            const produto = selectedId ? { productId: selectedId, unidade_medida: 'kg' } : null;
-            setProdutoSelecionado(produto);
-            setUnidadeSelecionada(produto?.unidade_medida ?? null);
-          }}
-          style={{ width: '100%', padding: 8, borderRadius: 4, borderColor: '#4CAF50' }}
-        >
-          <option value="">Selecione o produto</option>
-          <option value="prod1">Produto 1</option>
-          <option value="prod2">Produto 2</option>
-          <option value="prod3">Produto 3</option>
-        </select>
-      </div>
+        <div className="">
+          <ProductLookupField
+            id="produto"
+            value={selectedProduct}
+            onChange={(p) => {
+              setSelectedProduct(p);
+              setUnidadeSelecionada(p?.unidade_medida ?? '');
+            }}
+            className="w-full"
+          />
 
-      <div style={{ marginBottom: 10 }}>
-        <NumberField
-          id="quantidade"
-          value={quantidade}
-          onChange={(e) => setQuantidade(e.target.value)}
-          label={`Quantidade${unidadeSelecionada ? ` (${unidadeSelecionada})` : ''}`}
-          placeholder="Informe a quantidade"
-          className=""
-          required
-        />
-      </div>
+          <UnitLookupField
+            id="unidade"
+            value={unidadeSelecionada}
+            onChange={(e) => setUnidadeSelecionada(e.target.value)}
+            label="Unidade de Medida"
+            className="w-full"
+            placeholder='Selecione uma unidade de medida'
+          />
 
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Unidade</label>
-        <select
-          value={unidadeSelecionada || ''}
-          onChange={(e) => setUnidadeSelecionada(e.target.value)}
-          style={{ width: '100%', padding: 8, borderRadius: 4, borderColor: '#4CAF50' }}
-        >
-          <option value="">Selecione a unidade</option>
-          <option value="kg">kg</option>
-          <option value="un">un</option>
-          <option value="l">l</option>
-        </select>
-      </div>
+          <NumberField
+            id="quantidade"
+            label={`Quantidade (${unidadeSelecionada || 'unidade'})`}
+            placeholder="Informe a quantidade"
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.target.value)}
+            className="w-full"
+            required
+          />
 
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ color: '#D5C1A1', display: 'block', marginBottom: 4 }}>Status da Produção</label>
-        <select
-          value={statusSelecionado || ''}
-          onChange={(e) => {
-            const value = e.target.value;
-            setStatusSelecionado(value);
-            if (value === 'Colhido') setDataEstimada('');
-          }}
-          style={{ width: '100%', padding: 8, borderRadius: 4, borderColor: '#4CAF50' }}
-        >
-          <option value="">Selecione o status</option>
-          {statusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-      </div>
+          <LookupField
+            id="status"
+            label="Status da Produção"
+            options={statusOptions}
+            value={statusSelecionado}
+            onChange={(e) => {
+              const value = e.target.value;
+              setStatusSelecionado(value);
+              if (value === 'Colhido') setDataEstimada('');
+            }}
+            className="w-full"
+            placeholder="Selecione o status"
+          />
 
-      <div style={{ marginBottom: 30 }}>
-        <DateField
-          id="data-estimada"
-          value={dataEstimada}
-          onChange={(e) => setDataEstimada(e.target.value)}
-          label="Data Estimada para Colheita"
-          placeholder="Selecione a data"
-          className=""
-          required={statusSelecionado !== 'Colhido'}
-        />
-      </div>
+          <DateField
+            id="data-estimada"
+            label="Data Estimada para Colheita"
+            placeholder="Selecione a data"
+            value={dataEstimada}
+            onChange={(e) => setDataEstimada(e.target.value)}
+            className="w-full"
+            required={statusSelecionado !== 'Colhido'}
+          />
 
-      <button
-        onClick={salvarProducao}
-        style={{
-          width: '100%',
-          padding: '14px 0',
-          backgroundColor: '#4CAF50',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 10,
-          fontSize: 16,
-          cursor: 'pointer',
-        }}
-      >
-        Registrar
-      </button>
-    </div>
+          <button
+            onClick={salvarProducao}
+            style={{
+              marginTop: '1rem',
+              padding: '0.8rem 1.2rem',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '16px',
+            }}
+          >
+            Registrar
+          </button>
+        </div>
+      </div>
+    </Dashboard>
   );
 }

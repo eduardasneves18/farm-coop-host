@@ -21,6 +21,7 @@ export class SalesFirebaseService {
     unit,
     clientName,
     paymentMethod,
+    date,
   }: {
     productId: string;
     productName: string;
@@ -29,13 +30,13 @@ export class SalesFirebaseService {
     unit: string;
     clientName: string;
     paymentMethod?: string;
+    date: string;
   }): Promise<void> {
     try {
       const user = await this.usersService.getUser();
       if (!user) throw new Error("Nenhum usuário autenticado");
 
       const userId = user.uid;
-      const date = format(new Date(), "yyyy-MM-dd HH:mm");
 
       await this.firebaseService.create("sales", {
         usuario_id: userId,
@@ -51,7 +52,6 @@ export class SalesFirebaseService {
 
       await this.cacheService.clearCache();
 
-      // Atualiza a lista de vendas no cache
       const sales = await this.getSalesPagination(userId, {
         lastSaleId: this.lastSaleId,
       });
@@ -59,7 +59,7 @@ export class SalesFirebaseService {
     } catch (e: any) {
       throw new Error(`Erro ao registrar venda: ${e.message || e}`);
     }
-  }
+}
 
   async getSales(productId?: string): Promise<Record<string, any>[]> {
     const snapshot = await this.firebaseService.fetch("sales");

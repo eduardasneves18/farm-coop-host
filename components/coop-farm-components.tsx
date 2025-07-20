@@ -8,7 +8,9 @@ TextField,
   LookupField,
   NextLinkWrapper,
   Menu,
-  Dashboard
+  Dashboard,
+  UnitLookupField,
+  ProductLookupField
 } from '../coop-components'
 
 export {
@@ -21,5 +23,7 @@ export {
   LookupField,
   NextLinkWrapper,
   Menu,
-  Dashboard
+  Dashboard,
+  UnitLookupField,
+  ProductLookupField
 };

@@ -1,16 +1,21 @@
+'use client';
+
 import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
 import { ProductionFirebaseService } from '@/services/firebase/production/production_firebase';
+import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
-import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
+import { UserAuthChecker } from '@/utils/auth/userAuthChecker';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 const goalsService = new GoalsFirebaseService();
 const salesService = new SalesFirebaseService();
 const productionService = new ProductionFirebaseService();
-const usersService = new UsersFirebaseService();
+const productService = new ProductsFirebaseService();
 
 type Meta = {
   id?: string;
+  nome?: string;
   tipo: string;
   produto: string;
   valor: number;
@@ -26,44 +31,55 @@ const ListGoalsScreen: React.FC = () => {
   const [metas, setMetas] = useState<Meta[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userChecked, setUserChecked] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const checkUserAndLoad = async () => {
-      const user = await usersService.getUser();
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
+    UserAuthChecker.check({
+      onAuthenticated: () => {
+        setUserChecked(true);
+        loadMetas();
+      },
+      onUnauthenticated: () => {
+        alert('Usuário não autenticado');
+        router.push('/user/login');
+      },
+    });
+  }, [router]);
 
+  const loadMetas = async () => {
+    try {
       const metasRaw = await goalsService.getGoalItems();
 
-      const metasCompletas: Meta[] = [];
+      const metasCompletas = await Promise.all(
+        metasRaw.map(async (meta) => {
+          let valorAtual: number | string | null = null;
 
-      for (const meta of metasRaw) {
-        let valorAtual: number | string | null = null;
+          if (meta.tipo === 'Venda') {
+            valorAtual = await salesService.getSalesProps(meta.produto, 'valor');
+          } else {
+            valorAtual = await productionService.getProductionProp(meta.produto, 'quantidade');
+          }
 
-        if (meta.tipo === 'Venda') {
-          valorAtual = await salesService.getSalesProps(meta.produto, 'valor');
-        } else {
-          valorAtual = await productionService.getProductionProp(meta.produto, 'quantidade');
-        }
+          const productName = await productService.getProductsProps(meta.produto, 'nome');
 
-        meta.valor_atual = typeof valorAtual === 'number'
-          ? valorAtual
-          : Number(valorAtual) || 0;
-
-        meta.valor = Number(meta.valor) || 0;
-
-        metasCompletas.push(meta);
-      }
+          return {
+            ...meta,
+            nome_produto: productName,
+            valor_atual: typeof valorAtual === 'number'
+              ? valorAtual
+              : Number(valorAtual) || 0,
+            valor: Number(meta.valor) || 0,
+          };
+        })
+      );
 
       setMetas(metasCompletas);
-      setUserChecked(true);
+    } catch (error) {
+      console.error('Erro ao carregar metas:', error);
+    } finally {
       setIsLoading(false);
-    };
-
-    checkUserAndLoad();
-  }, []);
+    }
+  };
 
   const getStatusColor = (meta: Meta) => {
     const valorAtual = meta.valor_atual ?? 0;
@@ -74,12 +90,8 @@ const ListGoalsScreen: React.FC = () => {
     return 'red';
   };
 
-  if (isLoading) {
+  if (!userChecked || isLoading) {
     return <div style={{ textAlign: 'center' }}>Carregando...</div>;
-  }
-
-  if (!userChecked) {
-    return <div style={{ textAlign: 'center' }}>Usuário não autenticado.</div>;
   }
 
   if (metas.length === 0) {
@@ -92,7 +104,9 @@ const ListGoalsScreen: React.FC = () => {
       <div style={{ marginTop: 16 }}>
         {metas.map((meta) => {
           const statusColor = getStatusColor(meta);
-          const metaAlvo = meta.tipo === 'Venda' ? meta.valor.toFixed(2) : (meta.quantidade ?? 0).toFixed(2);
+          const metaAlvo = meta.tipo === 'Venda'
+            ? meta.valor.toFixed(2)
+            : (meta.quantidade ?? 0).toFixed(2);
           const atual = (meta.valor_atual ?? 0).toFixed(2);
 
           return (
@@ -111,9 +125,14 @@ const ListGoalsScreen: React.FC = () => {
               }}
             >
               <div>
-                <strong>{meta.tipo}: {meta.nome_produto}</strong>
+                <strong>{meta.nome}</strong>
                 <div style={{ fontSize: 14, color: '#ccc' }}>
-                  Meta: {metaAlvo} {meta.unidade} | Atual: {atual} <br />
+                  Tipo: {meta.tipo}
+                  <br />
+                  Poduto: {meta.nome_produto}
+                  <br />
+                  Meta: {meta.valor} - {meta.quantidade} {meta.unidade} | Atual: {atual}
+                  <br />
                   Prazo: {meta.prazo}
                 </div>
               </div>

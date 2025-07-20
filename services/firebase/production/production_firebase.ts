@@ -6,9 +6,9 @@ type ProductionItem = {
   id?: string;
   produto: string;
   quantidade: number;
-  unidade_medida: string;
+  unidadeMedida: string;
   status: string;
-  data_estimativa_colheita: string;
+  dataEstimadaColheita: string;
   timestamp: string;
 };
 
@@ -38,9 +38,9 @@ export class ProductionFirebaseService {
         usuario_id: user.uid,
         produto,
         quantidade,
-        unidade_medida: unidadeMedida,
+        unidadeMedida,
         status,
-        data_estimativa_colheita: dataEstimadaColheita,
+        dataEstimadaColheita: dataEstimadaColheita,
         timestamp: new Date().toISOString(),
       });
 
@@ -70,10 +70,10 @@ export class ProductionFirebaseService {
                 id: key,
                 produto: value.produto,
                 quantidade: value.quantidade,
-                unidade_medida: value.unidade_medida,
+                unidadeMedida: value.unidade,
                 status: value.status,
-                data_estimativa_colheita: value.data_estimativa_colheita,
-                timestamp: value.timestamp,
+                dataEstimadaColheita: value.data_estimada,
+                timestamp: value.created_at,
               });
             }
           }

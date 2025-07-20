@@ -11,6 +11,8 @@ type GoalItem = {
   unidade: string;
   prazo: string;
   timestamp: string;
+  nome: string;
+  quantidade: number;
 };
 
 export class GoalsFirebaseService {
@@ -43,6 +45,7 @@ export class GoalsFirebaseService {
 
       await this.firebaseService.create('goals', {
         usuario_id: user.uid,
+        nome,
         tipo,
         produto,
         valor,
@@ -76,12 +79,14 @@ export class GoalsFirebaseService {
               metas.push({
                 id: key,
                 tipo: value.tipo,
+                nome: value.nome,
                 produto: value.produto,
                 valor: value.valor,
                 valor_atual: value.valor_atual,
                 unidade: value.unidade,
                 prazo: value.prazo,
                 timestamp: value.timestamp,
+                quantidade: value.quantidade,
               });
             }
           }
@@ -126,4 +131,51 @@ export class GoalsFirebaseService {
       }
     }
   }
+
+  async VerifyGoals(productId: string, novoValor: number, dataOperacao: string): Promise<Meta[] | void> {
+  try {
+    const allGoals = await this.getGoalItems(); // todas as metas
+    const metasDoProduto = allGoals.filter(goal => goal.produto === productId);
+
+    const metasAtingidas: Meta[] = [];
+
+    for (const meta of metasDoProduto) {
+      const prazo = new Date(meta.prazo);
+      const dataInsercao = new Date(dataOperacao);
+
+      // Ignora metas cujo prazo passou
+      if (dataInsercao > prazo) continue;
+
+      const metaAlvo = meta.tipo === 'Venda'
+        ? Number(meta.valor ?? 0)
+        : Number(meta.quantidade ?? 0);
+
+      const valorAtualAnterior = Number(meta.valor_atual ?? 0);
+      const valorAtualAtualizado = valorAtualAnterior + novoValor;
+
+      // Atualiza a meta no banco
+      await this.updateGoalItem(meta.id!, {
+        valor_atual: valorAtualAtualizado
+      });
+
+      // Verifica se a meta foi alcancada
+      if (valorAtualAtualizado >= metaAlvo) {
+        metasAtingidas.push({
+          ...meta,
+          valor_atual: valorAtualAtualizado
+        });
+      }
+    }
+
+    if (metasAtingidas.length > 0) {
+      console.log('🎯 Metas atingidas dentro do prazo:', metasAtingidas);
+    }
+
+    return metasAtingidas;
+  } catch (error) {
+    console.error('Erro ao verificar metas:', error);
+  }
 }
+
+}
+

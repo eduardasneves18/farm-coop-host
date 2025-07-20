@@ -5,10 +5,11 @@ import { useRouter } from 'next/router';
 import {
   TextField,
   NumberField,
+  UnitLookupField,
 } from '../../components/coop-farm-components';
 
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
-import { UserAuthChecker } from '@/utils/userAuthChecker';
+import { UserAuthChecker } from '@/utils/auth/userAuthChecker';
 
 const InsertProductScreen: React.FC = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const InsertProductScreen: React.FC = () => {
         router.push('/user/login');
       },
     });
-  }, [router]); // ✅ Correção: adiciona router como dependência
+  }, [router]);
 
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('');
@@ -34,10 +35,7 @@ const InsertProductScreen: React.FC = () => {
 
   const productService = new ProductsFirebaseService();
 
-  const handleProfitCalc = () => {
-    const cost = typeof costPrice === 'string' ? parseFloat(costPrice) : costPrice;
-    const sell = typeof sellPrice === 'string' ? parseFloat(sellPrice) : sellPrice;
-
+  const calculateProfit = (cost: number, sell: number) => {
     if (!cost || !sell || cost <= 0) {
       setProfitMargin('');
       setProfitValue(0);
@@ -47,19 +45,62 @@ const InsertProductScreen: React.FC = () => {
     const profit = sell - cost;
     const margin = (profit / cost) * 100;
 
-    setProfitMargin(`${margin.toFixed(2)} %`);
     setProfitValue(profit);
+    setProfitMargin(`${margin.toFixed(2)} %`);
+  };
+
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setCostPrice(value);
+    if (sellPrice !== '') {
+      calculateProfit(value, Number(sellPrice));
+    }
+  };
+
+  const handleSellChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setSellPrice(value);
+    if (costPrice !== '') {
+      calculateProfit(Number(costPrice), value);
+    }
+  };
+
+  const validateForm = () => {
+    if (!name.trim()) {
+      alert('O nome do produto é obrigatório.');
+      return false;
+    }
+
+    if (!unit || unit.trim() === '') {
+      alert('Selecione uma unidade de medida.');
+      return false;
+    }
+
+    if (quantity === '' || Number(quantity) <= 0) {
+      alert('Informe uma quantidade válida.');
+      return false;
+    }
+
+    if (costPrice === '' || Number(costPrice) <= 0) {
+      alert('Informe um preço de custo válido.');
+      return false;
+    }
+
+    if (sellPrice === '' || Number(sellPrice) <= 0) {
+      alert('Informe um preço de venda válido.');
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async () => {
-    if (!name || !unit || quantity === '' || costPrice === '' || sellPrice === '') {
-      alert('Preencha todos os campos corretamente.');
-      return;
-    }
 
     try {
       const percentual = parseFloat(profitMargin.replace('%', '').trim()) || 0;
 
+      if (!validateForm()) return;
+      
       await productService.createProduct({
         nome: name,
         unidadeMedida: unit,
@@ -71,7 +112,6 @@ const InsertProductScreen: React.FC = () => {
       });
 
       alert('Produto cadastrado com sucesso!');
-
 
       setName('');
       setUnit('');
@@ -91,7 +131,10 @@ const InsertProductScreen: React.FC = () => {
 
   return (
     <div>
-      <div className="header-extrato" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        className="header-extrato"
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
         <h2>Cadastro de produtos</h2>
       </div>
       <hr />
@@ -105,13 +148,11 @@ const InsertProductScreen: React.FC = () => {
         className="field"
       />
 
-      <TextField
-        id="unit"
-        label="Unidade de Medida"
-        placeholder="Ex: kg, l, un"
+      <UnitLookupField
+        id="unidade"
         value={unit}
         onChange={(e) => setUnit(e.target.value)}
-        className="field"
+        placeholder='Selecione uma unidade de medida'
       />
 
       <NumberField
@@ -125,25 +166,19 @@ const InsertProductScreen: React.FC = () => {
 
       <NumberField
         id="costPrice"
-        label="Preço de Custo"
+        label={`Preço de Custo${unit ? ` por ${unit}` : ''}`}
         placeholder="Digite o preço de custo"
         value={costPrice}
-        onChange={(e) => {
-          setCostPrice(Number(e.target.value));
-          handleProfitCalc();
-        }}
+        onChange={handleCostChange}
         className="field"
       />
 
       <NumberField
         id="sellPrice"
-        label="Preço de Venda"
+        label={`Preço de Venda${unit ? ` por ${unit}` : ''}`}
         placeholder="Digite o preço de venda"
         value={sellPrice}
-        onChange={(e) => {
-          setSellPrice(Number(e.target.value));
-          handleProfitCalc();
-        }}
+        onChange={handleSellChange}
         className="field"
       />
 
@@ -152,9 +187,8 @@ const InsertProductScreen: React.FC = () => {
         label="Margem de Lucro (%)"
         placeholder="Lucro calculado"
         value={profitMargin}
-        className="field" onChange={function (): void {
-          throw new Error('Function not implemented.');
-        } }      />
+        className="field" 
+        onChange={(e) => setProfitMargin(e.target.value)}      />
 
       <button
         onClick={handleSubmit}
