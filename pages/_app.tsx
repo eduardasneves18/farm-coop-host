@@ -37,7 +37,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <Header
             user="N"
             type="generic"
-            userName="Eduarda Silva Neves"
             appTitlePrimary="CoopFarm"
           />
         )}
