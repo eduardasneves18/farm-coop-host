@@ -87,56 +87,57 @@ const LoginScreen: React.FC = () => {
     };
   }, [sessionManager]);
 
-  return (<><Dashboard>
-      <div className={styles.container}>
-        <div className={styles.form}>
-          <div className={styles.iconContainer}>
-            <span className={styles.icon}>🌱</span>
-            <h1 className={styles.title}>FarmCoop</h1>
-            <p className={styles.subtitle}>Faça seu login para continuar</p>
-          </div>
-
-          <input
-            type="email"
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={styles.input}
-          />
-
-          <input
-            type="password"
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            className={styles.input}
-          />
-
-          <div className={styles.registerLink}>
-            Ainda não possui uma conta?{' '}
-            <Link href="/user/insert" className={styles.link}>
-              Cadastre-se
-            </Link>
-          </div>
-
-          <button
-            onClick={handleLogin}
-            disabled={loading}
-            className={styles.button}
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
+  return (
+    <Dashboard className='login-center'>
+    <div className="login-insert">
+      <div className={styles.form}>
+        <div className={styles.iconContainer}>
+          <span className={styles.icon}>🌱</span>
+          <h1 className={styles.title}>FarmCoop</h1>
+          <p className={styles.subtitle}>Faça seu login para continuar</p>
         </div>
 
-        {dialog && (
-          <DialogMessage
-            title={dialog.title}
-            message={dialog.message}
-            onClose={() => setDialog(null)}
-          />
-        )}
+        <input
+          type="email"
+          placeholder="E-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className={styles.input}
+        />
+
+        <input
+          type="password"
+          placeholder="Senha"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          className={styles.input}
+        />
+
+        <div className={styles.registerLink}>
+          Ainda não possui uma conta?{' '}
+          <Link href="/user/insert" className={styles.link}>
+            Cadastre-se
+          </Link>
+        </div>
+
+        <button
+          onClick={handleLogin}
+          disabled={loading}
+          className={styles.button}
+        >
+          {loading ? 'Entrando...' : 'Entrar'}
+        </button>
       </div>
-    </Dashboard></>
+
+      {dialog && (
+        <DialogMessage
+          title={dialog.title}
+          message={dialog.message}
+          onClose={() => setDialog(null)}
+        />
+      )}
+    </div>
+    </Dashboard>
   );
 };
 

@@ -19,7 +19,6 @@ const InsertProductScreen: React.FC = () => {
     UserAuthChecker.check({
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
-        alert('Usuário não autenticado');
         router.push('/user/login');
       },
     });

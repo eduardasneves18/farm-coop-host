@@ -1,0 +1,86 @@
+# Node.js dependencies
+/node_modules/
+
+# Build output
+/.next/
+/out/
+
+# Production build
+/.next/
+/.next/
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Next.js specific
+*.next/
+*.log
+
+# Next.js build artifacts
+/.next/
+/out/
+
+# Local env files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# VSCode settings
+.vscode/
+
+# JetBrains IDEs (like WebStorm, IntelliJ IDEA)
+.idea/
+
+# npm / yarn lock files can be included or excluded depending on your workflow
+# npm
+package-lock.json
+
+# yarn
+yarn.lock
+
+# Log files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Next.js pages cache
+.cache/
+
+# TypeScript build cache (if using TypeScript)
+tsconfig.json
+tsconfig.build.json
+
+# Coverage directory used by testing tools
+coverage/
+
+# Debug files
+debug.log
+
+# Optional dependencies for multi-micro-frontend (if any)
+# Example: Next.js-based configurations could involve monorepo or workspace tools, such as:
+# /node_modules/ (for each subproject in a monorepo setup)
+# or /packages/
+
+# Ignore database file
+database.db
+
+# Or if it's in a specific folder
+# data/database.db
+
+# Ignore all .db files in the project
+*.db
+
+# Ignore uploads folder inside public directory
+/public/uploads/

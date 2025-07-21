@@ -30,7 +30,6 @@ export default function InsertGoalScreen() {
     UserAuthChecker.check({
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
-        alert('Usuário não autenticado');
         router.push('/user/login');
       },
     });

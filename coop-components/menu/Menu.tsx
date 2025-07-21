@@ -31,8 +31,13 @@ const Menu: React.FC<MenuProps> = ({ items }) => (
       </React.Fragment>
     ))}
     <li className='logout'>
+      <Link href='http://localhost:3001' passHref legacyBehavior>
+        <a className="item" target="_blank" rel="noopener noreferrer">Sobre</a>
+      </Link>
+    </li>
+    <li className='logout'>
       <Link href='user/login' passHref legacyBehavior>
-        <a onClick={handleLogoutClick}>Sair</a>
+        <a className="item" onClick={handleLogoutClick}>Sair</a>
       </Link>
     </li>
   </ul>

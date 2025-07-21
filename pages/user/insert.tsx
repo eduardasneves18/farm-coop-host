@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { TextField, PasswordField, Dashboard } from '../../components/coop-farm-components';;
+import { TextField, PasswordField } from '../../components/coop-farm-components';;
 import { UsersFirebaseService } from '@/services/firebase/users/user_firebase';
 
 export default function UserRegister() {

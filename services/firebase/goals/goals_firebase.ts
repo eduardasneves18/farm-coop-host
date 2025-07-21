@@ -168,7 +168,7 @@ export class GoalsFirebaseService {
     }
 
     if (metasAtingidas.length > 0) {
-      console.log('🎯 Metas atingidas dentro do prazo:', metasAtingidas);
+      alert('Metas atingidas dentro do prazo!');
     }
 
     return metasAtingidas;

@@ -28,6 +28,12 @@ body {
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -114,6 +120,7 @@ main {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  width: 100%;
 }
 
 .central-content {
@@ -121,6 +128,30 @@ main {
   flex-direction: row;
   width: 100%;
   height: 90vh;
+}
+
+.dashboard-content {
+  width: 100%;
+}
+
+.login-insert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  background: transparent; 
+  align-items: center;
+  align-content: center;
+}
+
+.login-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: transparent; 
+  align-items: center;
+  align-content: center;
 }
 
 .border-gradient {

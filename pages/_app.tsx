@@ -44,7 +44,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <div className="central-content">
           {!isPublicRoute && <Menu items={menuItems} />}
           <main>
-            <Dashboard>
+            <Dashboard className='dashboard-content'>
               {isPublicRoute ? (
                 <Component {...pageProps} />
               ) : (

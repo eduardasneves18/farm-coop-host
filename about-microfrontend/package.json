@@ -1,0 +1,23 @@
+{
+  "name": "about",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "set NEXT_PRIVATE_LOCAL_WEBPACK=true && rm -rf .next && next dev -p 3001",
+    "build": "set NEXT_PRIVATE_LOCAL_WEBPACK=true next build",
+    "start": "set NEXT_PRIVATE_LOCAL_WEBPACK=true NODE_ENV=production next start -p 3001"
+  },
+  "dependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "typescript": "^5.7.3",
+    "webpack": "5.96.1",
+    "@module-federation/nextjs-mf": "^8.8.32",
+    "concurrently": "^8.2.2",
+    "next": "15.3.5",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^9.6.1",
+    "eslint": "^9.18.0"
+  }
+}

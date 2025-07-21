@@ -40,7 +40,6 @@ const ListGoalsScreen: React.FC = () => {
         loadMetas();
       },
       onUnauthenticated: () => {
-        alert('Usuário não autenticado');
         router.push('/user/login');
       },
     });

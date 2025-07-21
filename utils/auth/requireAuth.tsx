@@ -14,8 +14,7 @@ export default function RequireAuth({ children }: RequireAuthProps) {
     UserAuthChecker.check({
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
-        alert('Usuário não autenticado');
-        router.push('/home');
+        router.push('/user/login');
       },
     });
   }, [router]);

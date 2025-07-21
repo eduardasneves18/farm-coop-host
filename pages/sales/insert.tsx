@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import {
   TextField,
   NumberField,
@@ -13,14 +12,11 @@ import {
 
 import { SalesFirebaseService } from '@/services/firebase/sales/sales_firebase';
 import { ProductsFirebaseService } from '@/services/firebase/products/products_firebase';
-import { UserAuthChecker } from '@/utils/auth/userAuthChecker';
 import { Product } from '@/types/field/product/ProductFireldProps';
 import { format } from 'date-fns';
 import { GoalsFirebaseService } from '@/services/firebase/goals/goals_firebase';
 
 export default function RegisterSaleScreen() {
-  const router = useRouter();
-  const [userChecked, setUserChecked] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantidade, setQuantidade] = useState<string>('');
@@ -35,16 +31,6 @@ export default function RegisterSaleScreen() {
   const salesService = new SalesFirebaseService();
   const goalService = new GoalsFirebaseService();
   const productsService = new ProductsFirebaseService();
-
-  useEffect(() => {
-    UserAuthChecker.check({
-      onAuthenticated: () => setUserChecked(true),
-      onUnauthenticated: () => {
-        alert('Usuário não autenticado');
-        router.push('/user/login');
-      },
-    });
-  }, [router]);
 
   useEffect(() => {
     const q = parseFloat(quantidade);
@@ -109,8 +95,6 @@ export default function RegisterSaleScreen() {
       }
     }
   };
-
-  if (!userChecked) return null;
 
   return (
     <Dashboard>

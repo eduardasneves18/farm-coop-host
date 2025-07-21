@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "preinstall": "npm install --ignore-scripts",
+    "start": "concurrently \"npm run start:host\" \"npm run start:about\"",
+    "start:host": "set NEXT_PRIVATE_LOCAL_WEBPACK=true && rm -rf .next  && node openBrowser.js && next dev -p 3000",
+    "start:about": "cd about-microfrontend && npm run dev"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@module-federation/nextjs-mf": "^8.8.32",
+    "concurrently": "^8.2.2",
     "date-fns": "^4.1.0",
     "firebase": "^11.10.0",
+    "fs": "^0.0.1-security",
     "mobx": "^6.13.7",
     "mobx-react-lite": "^4.1.0",
     "next": "15.3.5",

@@ -35,7 +35,6 @@ export default function RegisterProductionScreen() {
     UserAuthChecker.check({
       onAuthenticated: () => setUserChecked(true),
       onUnauthenticated: () => {
-        alert('Usuário não autenticado');
         router.push('/user/login');
       },
     });
