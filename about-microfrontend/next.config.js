@@ -1,5 +1,11 @@
 const NextFederationPlugin = require('@module-federation/nextjs-mf');
 
+const remotes = isServer => {
+  const location = isServer ? 'ssr' : 'chunks';
+  return {
+    home: `about@http://localhost:3001/_next/static/${location}/remoteEntry.js`,
+  };
+};
 module.exports = {
   webpack(config, options) {
     config.plugins.push(
@@ -9,24 +15,8 @@ module.exports = {
         exposes: {
           './AboutComponent': './components/AboutComponent.tsx',
         },
-        // shared: ['react', 'react-dom', 'next'],
-         shared: {
-          react: {
-            singleton: true,
-            requiredVersion: false,
-            eager: true,
-          },
-          'react-dom': {
-            singleton: true,
-            requiredVersion: false,
-            eager: true,
-          },
-          next: {
-            singleton: true,
-            requiredVersion: false,
-            eager: true,
-          },
-        },
+        remotes: remotes(options.isServer),
+        shared: ['react', 'react-dom', 'next'],
         extraOptions: {
           exposePages: true,
         },

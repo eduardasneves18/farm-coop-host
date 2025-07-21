@@ -4,7 +4,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import Logo from "./Logo";
 import { HeaderProps } from "../../types/header/HeaderProps";
 import Link from "next/link";
-// import './Header.css';
+import clienteStore from '../../store/client_store';
 
 const UserName: React.FC<{ name?: string }> = ({ name }) => (
   <div className="yes-bank-header-user-name">{name ?? ""}</div>
@@ -14,7 +14,6 @@ const UserName: React.FC<{ name?: string }> = ({ name }) => (
 const Header: React.FC<HeaderProps> = ({
   user,
   type,
-  userName,
   appTitlePrimary,
 }) => {
   if (!user || !type) {
@@ -28,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({
         link="/home"
         appTitlePrimary={appTitlePrimary}
       />
-      <UserName name={userName} />
+      <UserName name={clienteStore.cliente.email ?? 'Deslogado'} />
       <div>
           <Link href="/home" className="yes-bank-header-link">
             <FontAwesomeIcon icon={faUser}/>

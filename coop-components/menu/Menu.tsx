@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { LoginFirebaseAuthService } from '@/services/firebase/users/login/login_firebase';
-// import './Menu.css';
+import clienteStore from '../../store/client_store';
 
 
 export type MenuItem = {
@@ -16,6 +16,7 @@ export type MenuProps = {
 const handleLogoutClick = () => {
   const loginService = new LoginFirebaseAuthService();
   loginService.signOut();
+  clienteStore.removeCliente();
 }
 const Menu: React.FC<MenuProps> = ({ items }) => (
     
