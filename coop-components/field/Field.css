@@ -17,7 +17,8 @@ input {
   border-color: #0a0a0a;
   border-radius: 5px;
   background-color: transparent;
-  height: 3vh;
+  height: 5vh;
+  width: 70vh;
 }
 
 input::placeholder {
@@ -34,7 +35,8 @@ input::placeholder {
   background-color: transparent;
   height: 3.8vh;
   width: '100%';
-  padding: 1%; 
+    height: 5vh;
+  width: 70vh;
 }
 
 option{
@@ -51,7 +53,7 @@ option{
 }
 
 select {
-  padding: 1%;
-  padding-left: 3%;
   color: #0a0a0a;
+    height: 5vh;
+  width: 70vh;
 }

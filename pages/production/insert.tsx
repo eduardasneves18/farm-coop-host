@@ -97,7 +97,7 @@ export default function RegisterProductionScreen() {
 
   return (
     <Dashboard>
-      <div style={{ maxWidth: 700, margin: 'auto', padding: 24 }}>
+      <div>
         <h2>Registro de Produção</h2>
         <hr className="my-4" />
 

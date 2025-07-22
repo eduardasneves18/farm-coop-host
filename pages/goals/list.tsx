@@ -51,23 +51,11 @@ const ListGoalsScreen: React.FC = () => {
 
       const metasCompletas = await Promise.all(
         metasRaw.map(async (meta) => {
-          let valorAtual: number | string | null = null;
-
-          if (meta.tipo === 'Venda') {
-            valorAtual = await salesService.getSalesProps(meta.produto, 'valor');
-          } else {
-            valorAtual = await productionService.getProductionProp(meta.produto, 'quantidade');
-          }
-
           const productName = await productService.getProductsProps(meta.produto, 'nome');
 
           return {
             ...meta,
             nome_produto: productName,
-            valor_atual: typeof valorAtual === 'number'
-              ? valorAtual
-              : Number(valorAtual) || 0,
-            valor: Number(meta.valor) || 0,
           };
         })
       );

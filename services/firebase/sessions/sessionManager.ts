@@ -3,7 +3,7 @@ import { Auth } from "firebase/auth";
 import clienteStore, { Cliente } from "@/store/client_store";
 
 export class SessionManager {
-  private static readonly sessionTimeout = 10 * 60 * 1000;
+  private static readonly sessionTimeout = 1000 * 60 * 1000;
   private sessionTimer: ReturnType<typeof setTimeout> | null = null;
   private auth: Auth;
   private user: Cliente;

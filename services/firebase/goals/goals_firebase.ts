@@ -134,6 +134,8 @@ export class GoalsFirebaseService {
 
   async VerifyGoals(productId: string, novoValor: number, dataOperacao: string): Promise<Meta[] | void> {
   try {
+    await this.cacheService.clear();
+
     const allGoals = await this.getGoalItems(); // todas as metas
     const metasDoProduto = allGoals.filter(goal => goal.produto === productId);
 
@@ -144,20 +146,19 @@ export class GoalsFirebaseService {
       const dataInsercao = new Date(dataOperacao);
 
       // Ignora metas cujo prazo passou
-      if (dataInsercao > prazo) continue;
-
+      
       const metaAlvo = meta.tipo === 'Venda'
-        ? Number(meta.valor ?? 0)
-        : Number(meta.quantidade ?? 0);
-
+      ? Number(meta.valor ?? 0)
+      : Number(meta.quantidade ?? 0);
+      
       const valorAtualAnterior = Number(meta.valor_atual ?? 0);
       const valorAtualAtualizado = valorAtualAnterior + novoValor;
-
+      
       // Atualiza a meta no banco
       await this.updateGoalItem(meta.id!, {
         valor_atual: valorAtualAtualizado
       });
-
+      
       // Verifica se a meta foi alcancada
       if (valorAtualAtualizado >= metaAlvo) {
         metasAtingidas.push({
@@ -165,10 +166,11 @@ export class GoalsFirebaseService {
           valor_atual: valorAtualAtualizado
         });
       }
-    }
-
-    if (metasAtingidas.length > 0) {
-      alert('Metas atingidas dentro do prazo!');
+      if (dataInsercao <= prazo) {
+        if (metasAtingidas.length > 0) {
+          alert('Metas atingidas dentro do prazo!');
+        }
+      }
     }
 
     return metasAtingidas;

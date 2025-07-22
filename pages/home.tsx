@@ -9,6 +9,10 @@ export default function HomePage() {
           <h1>🌿 Coop Farm</h1>
         </div>
         <hr />
+          <h3>Bem vindo(a) à nossa cooperativa!</h3>
+          <a>Unindo forças para cultivar um futuro melhor 🌱</a>
+          <br></br>
+          <a>Somos uma cooperativa formada por fazendas que acreditam na força do trabalho coletivo, na valorização do produtor rural e na sustentabilidade do campo.</a>
         <div>
 
         </div>

@@ -208,7 +208,6 @@ h2 {
   padding: 4%;
 }
 
-
 .table-cell {
   background-color: #1f1f1f !important;
   color: white !important;
@@ -227,4 +226,8 @@ h2 {
 .row-number-cell {
   background-color: #1f1f1f !important;
   color: #999 !important;
+}
+
+h3, a {
+  color: #9C9C9C;
 }
