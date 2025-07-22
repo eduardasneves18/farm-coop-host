@@ -52,7 +52,7 @@ npm ci
 Execute o aplicativo:
 
 ```bash
-npm run edv
+npm run start
 ```
 O app será iniciado em um navegador web.
 
